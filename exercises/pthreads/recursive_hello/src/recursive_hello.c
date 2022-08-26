@@ -28,6 +28,7 @@ int main(void) {
   } else {
     fprintf(stderr, "Error: could not create secondary thread\n");
   }
+
   return error;
 }  // end procedure
 

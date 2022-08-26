@@ -29,9 +29,11 @@ void* grandmother_orders (void* value) {
 
     pthread_t grandchild_a_thread, grandchild_b_thread;
 
+    size_t pseudoseed_a = (size_t) &grandchild_a_thread, pseudoseed_b = (size_t) &grandchild_b_thread;
+
     // create threads, no parameter to be passed
-    int grandchild_a_error = pthread_create(&grandchild_a_thread, NULL, fetch_lottery, NULL),
-        grandchild_b_error = pthread_create(&grandchild_b_thread, NULL, fetch_lottery, NULL);
+    int grandchild_a_error = pthread_create(&grandchild_a_thread, NULL, fetch_lottery, (void*) pseudoseed_a),
+        grandchild_b_error = pthread_create(&grandchild_b_thread, NULL, fetch_lottery, (void*) pseudoseed_b);
 
     if (grandchild_a_error == EXIT_SUCCESS && grandchild_b_error == EXIT_SUCCESS) {
 
@@ -55,14 +57,15 @@ void* grandmother_orders (void* value) {
 
 void* fetch_lottery (void* lottery_number) {
     (void) lottery_number; // supressing unused parameter warning
-    size_t lower_limit = 0, upper_limit = 100;
+    size_t lower_limit = 0, upper_limit = 99;
 
     // create random number
-    srand(rand());
-    size_t lottery_number_fetched = (size_t) (rand() % (upper_limit - lower_limit + 1)) + lower_limit;
+    unsigned int seed = (size_t) lottery_number;
+    
+    size_t lottery_number_fetched = (size_t) (rand_r(&seed) % (upper_limit - lower_limit + 1)) + lower_limit;
 
     // kids bought the number and report it
-    printf("Grandma! I brought %lu!\n", lottery_number_fetched);
+    printf("Grandma! I bought %lu!\n", lottery_number_fetched);
 
     #if VARIANT == 1 //for first case (address of purchased number)
         return (void*) &lottery_number_fetched; 
