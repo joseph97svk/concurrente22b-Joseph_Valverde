@@ -8,8 +8,10 @@ Modele la situación anterior, con la abuela como el hilo principal, y los dos n
 
 Utilice las herramientas de análisis dinámico de código para determinar cuál de las dos variantes anteriores produce el resultado correcto.
 
-Resultados al utilizar opcion 1:
+Resultados incorrectos al utilizar opcion 1:
 
 Grandma! I bought 21!
 Grandma! I bought 87!
 The grandchildren fetched the numbers: 0 and 0 //el puntero lleva a direcciones dealocadas y por ende se pierden los valores
+
+Con opcion 2, los resultados si son consistentes
