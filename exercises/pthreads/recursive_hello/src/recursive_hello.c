@@ -43,13 +43,12 @@ void* greet(void* data) {
     // greet
     printf("Hello there: %lu\n", action);
 
-
     // create thread and buffer with new value
     pthread_t recursive_hello_thread;
     size_t buffer =  action - 1;    
 
     // recursive
-    recursive_hello_error = pthread_create(&recursive_hello_thread, /*attr*/ NULL, greet, /*arg*/ (void*)&buffer);
+    recursive_hello_error = pthread_create(&recursive_hello_thread, /*attr*/ NULL, greet, /*arg*/ (void*) &buffer);
 
     // add thread only if one was created
     if (recursive_hello_error == EXIT_SUCCESS) {
