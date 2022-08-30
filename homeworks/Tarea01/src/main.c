@@ -4,15 +4,13 @@
 
 #include "Goldbach_conjecture.h"
 
-
-
 int main(void) {
     // declare goldbach_arr
     goldbach_arr_t goldbach_arr;
 
     // initialize goldbach_arr
     goldbach_arr_init(&goldbach_arr);
-
+       
     // read values into it
     if (goldbach_read_numbers(&goldbach_arr) == EXIT_SUCCESS) {
 

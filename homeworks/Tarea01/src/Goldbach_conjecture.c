@@ -88,11 +88,11 @@ int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t number
     const int32_t size = 2;
 
     int64_t* current_sum = malloc(size * sizeof(int64_t));
-
+    /*
     for (int64_t current_num = 0; current_num < number; 
     current_num = find_next_prime(current_num)) {
-       
-    }
+      
+    } */
 
     free (current_sum);
 
@@ -100,34 +100,35 @@ int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t number
 }
 
 int64_t find_next_prime(const int64_t last_prime) {
-    bool isPrime = false;
+     bool isPrime = false;
     int64_t number = last_prime + 1;
 
     while (!isPrime) {
-        int64_t comparator = 3;
-
-        if (number == 2) {
-            isPrime = true;
-            return number;
-        }
-
-        if (number % 2 == 0) {
-            isPrime = false;
-            number +=1;
-            continue;
-        }
-
-        while (number % comparator != 0  && comparator <= number/2) {
-            comparator += 2;
-        }
-        
-        isPrime = comparator >= number/2;
-
+        isPrime = isPrimeNum(number);
         if (!isPrime) {
             number+= 1;
         }
     }
+
     return number;
+}
+
+bool isPrimeNum (const int64_t number) {
+    int64_t comparator = 3;
+
+    if (number == 2) {
+        return true;
+    } 
+
+    if (number % 2 == 0) {
+        return false;
+    }
+
+    while (number % comparator != 0  && comparator <= number/2) {
+        comparator += 2;
+    }
+        
+    return comparator >= number/2;
 }
 
 void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
