@@ -99,25 +99,28 @@ int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const in
     }
 
     // get the position for the operations
-    int64_t sum_position = arr -> elements[(arr -> length -> integer) - 1];
+    int64_t sum_position = arr -> elements[(arr -> length -> integer) - 1] -> sum_amount;
 
     // increase sum amount
     arr -> elements[position] -> sum_amount = (arr -> elements[position] -> sum_amount) + 1;
 
-    
-    int64_t** sums_buffer = realloc(arr -> elements[position] -> sums, arr -> elements[position] -> sum_amount);
+    // increase the amount of space in the array of pointers
+    int64_t** sums_buffer = realloc(arr -> elements[position] -> sums, 
+    (arr -> elements[position] -> sum_amount) * sizeof(int64_t**));
 
     if (sums_buffer == NULL) {
         return EXIT_FAILURE;
     }
 
+    // assign new address if succesful
     arr -> elements[position] -> sums = sums_buffer;
 
+    // buffer the sum amount
     int64_t sum_element_amount = (arr -> elements[position] -> sum_element_amount);
-
+    
+    // allocate the space in the given pointer
     arr -> elements[position] -> sums[sum_position] = 
-    malloc(sum_element_amount * sizeof(int64_t*));
-
+    malloc(sum_element_amount * sizeof(int64_t));
 
     int64_t* pointer_check = sum;
 
@@ -152,7 +155,7 @@ int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size, const 
     }
 
     // if out of bounds, then return null pointer. After previous check to prevent undefined behaviour
-    if (sum_position > arr -> elements[num_position] -> sum_element_amount) {
+    if (sum_position > arr -> elements[num_position] -> sum_amount) {
         return NULL;
     }
 
@@ -160,7 +163,11 @@ int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size, const 
     *size = arr -> elements[num_position] -> sum_element_amount;
 
     // allocate space for the array to be returned
-    int64_t* sum = malloc(*size * sizeof(int));
+    int64_t* sum = malloc(*size * sizeof(int64_t));
+
+    if (sum == NULL) {
+        return NULL;
+    }
 
     // copy the sum to the allocated array to be returned
     for (int64_t sum_num = 0; sum_num < *size; sum_num++) {

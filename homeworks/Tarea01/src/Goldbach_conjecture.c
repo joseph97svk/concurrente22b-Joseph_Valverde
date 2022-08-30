@@ -10,9 +10,13 @@
 
 bool num_validity_check(char string[64], int64_t* value);
 
-void goldbach_pair_num(const int64_t num);
+int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t num, const int64_t position);
 
-void goldbach_odd_num(const int64_t num);
+int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr, const int64_t num, const int64_t position);
+
+int64_t find_next_prime(const int64_t last_prime);
+
+bool isPrimeNum (const int64_t number);
 
 int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr) {
     // space to read a value up to 64 digits
@@ -63,16 +67,16 @@ int32_t goldbach_process_sums(goldbach_arr_t* goldbach_arr) {
         }
 
         if (current_num % 2 == 0) {
-            goldbach_even_process(goldbach_arr, current_num);
+            goldbach_even_process(goldbach_arr, current_num, number);
         } else {
-            goldbach_odd_process(goldbach_arr, current_num);
+            goldbach_odd_process(goldbach_arr, current_num, number);
         }
     }
 
     return EXIT_SUCCESS;
 }
 
-int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr, const int64_t number) {
+int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr, const int64_t number, const int64_t position) {
     const int32_t size = 3;
 
     int64_t* current_sum = malloc(size * sizeof(int64_t));
@@ -84,15 +88,22 @@ int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr, const int64_t number)
     return EXIT_SUCCESS;
 }
 
-int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t number) {
+int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t number, const int64_t position) {
     const int32_t size = 2;
+    int64_t other_number = 0;
 
     int64_t* current_sum = malloc(size * sizeof(int64_t));
-    /*
-    for (int64_t current_num = 0; current_num < number; 
-    current_num = find_next_prime(current_num)) {
-      
-    } */
+    
+    for (int64_t current_number = 1; current_number < number/2; 
+    current_number = find_next_prime(current_number)) {
+        other_number = number - current_number;
+        // if both numbers are prime
+        if (isPrimeNum(other_number)) {
+            current_sum[0] = current_number;
+            current_sum[1] = other_number;
+            goldbach_add_sum(goldbach_arr, current_sum, position);
+        }
+    } 
 
     free (current_sum);
 
@@ -100,7 +111,7 @@ int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t number
 }
 
 int64_t find_next_prime(const int64_t last_prime) {
-     bool isPrime = false;
+    bool isPrime = false;
     int64_t number = last_prime + 1;
 
     while (!isPrime) {
@@ -146,7 +157,7 @@ void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
         for (int64_t sum_in_num = 0; sum_in_num < sum_amount; sum_in_num++) {
             
             if (current_num < 0) {
-                current_sum = goldbach_get_sum(goldbach_arr, &size, num, 0);
+                current_sum = goldbach_get_sum(goldbach_arr, &size, num, sum_in_num);
 
                 for (int64_t sum_element = 0; sum_element < size; ++sum_element) {
                     printf("%" PRId64 " ", current_sum[sum_element]);
