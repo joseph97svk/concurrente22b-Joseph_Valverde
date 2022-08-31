@@ -1,3 +1,5 @@
+Utilizando los argumentos en línea de comandos, ubique la cantidad máxima de threads que su sistema operativo le permite crear. Escriba el número obtenido en un archivo readme.ext en su carpeta ejemplos/pthreads/hello_iw_pri, junto con el nombre de su sistema operativo (por ejemplo, Debian 10 64bits o Fedora 30 64bits).
+
 MAX Threads according to (ulimit -u): 63287
 
 Sistema Operativo: Pop!_OS 22.04 LTSs
