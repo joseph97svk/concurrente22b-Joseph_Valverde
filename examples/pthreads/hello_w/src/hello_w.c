@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <unistd.h>
+#include <inttypes.h>
 // #include <unistd.h>
 
 /**
@@ -13,51 +14,66 @@
  */
 void* greet(void* data);
 
+int create_threads (uint64_t thread_count);
+
 // procedure main:
 int main(int argc, char* argv[]) {
-  // declare thread(greet)
-  pthread_t thread;
-
-  __int64_t thread_amount = sysconf(_SC_NPROCESSORS_ONLN);
+  int64_t thread_amount = sysconf(_SC_NPROCESSORS_ONLN);
 
   // if there are two arguments
   if (argc == 2) {
-    if (sscanf(stdin, "%i", (__int64_t)thread_amount) == 1) {
-      
-    }  else {
-      fprintf(stderr, "Error: invalid input given!");
+    if (sscanf(argv[1], "%li", &thread_amount) != 1) {
+      fprintf(stderr, "Error: invalid input given!\n");
       return EXIT_FAILURE;
     }
-  } else if (argc == 1) {
-
-  } else {
-    fprintf(stderr, "Error: invalid input given!");
+  } else if (argc > 2) {
+    fprintf(stderr, "Error: invalid input given! Too many arguments!\n");
     return EXIT_FAILURE;
-  }
+  } 
 
-  // create_thread(greet), parameter irrelevant
-  int error = pthread_create(&thread, /*attr*/ NULL, greet, /*arg*/ NULL);
+  // create_threads
+  return create_threads (thread_amount);
   
-  if (error == EXIT_SUCCESS) {
-    // print "Hello from main thread"
-    // usleep(1);  // indeterminism
-    printf("Hello from main thread\n");
+}  // end procedure
 
-    // join the thread, return value irrelevant
-    pthread_join(thread, /*value_ptr*/ NULL);
+int create_threads (uint64_t thread_count) {
+  int error = EXIT_SUCCESS;
+  //int error = pthread_create(&thread, /*attr*/ NULL, greet, /*arg*/ NULL);
+
+  pthread_t* threads = (pthread_t*) malloc(thread_count * sizeof(pthread_t));
+  
+  if (threads != NULL) {
+    for (uint64_t current_thread = 0; current_thread < thread_count;
+     ++current_thread) {
+       error = pthread_create(&threads[current_thread], NULL, greet,
+       (void*) current_thread);
+
+      if (error != EXIT_SUCCESS) {
+        fprintf(stderr, "Error: could not create secondary thread\n");
+        break;
+      }
+    }
+
+    printf("Hello from main thread!\n");
+
+    for (uint64_t current_thread = 0; current_thread < thread_count;
+     ++current_thread) {
+      pthread_join(threads[current_thread], NULL);
+    }
+
+    free(threads);
   } else {
     // in case a thread could not be spawned, report so
-    fprintf(stderr, "Error: could not create secondary thread\n");
+    fprintf(stderr, "Error: could not create given thread amount\n");
   }
   return error;
-}  // end procedure
+}
 
 // procedure greet:
 void* greet(void* data) {
-  // surpress unused parameter warning
-  (void)data;
+  const uint64_t rank = (uint64_t) data;
   // print "Hello from secondary thread"
-  printf("Hello from secondary thread\n");
+  printf("Hello from secondary thread %lu\n", rank);
 
   // must return a pointer, function is void*, not void
   return NULL;
