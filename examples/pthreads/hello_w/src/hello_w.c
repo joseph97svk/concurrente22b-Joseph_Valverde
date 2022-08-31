@@ -24,9 +24,15 @@ int main(int argc, char* argv[]) {
   if (argc == 2) {
     if (sscanf(stdin, "%i", (__int64_t)thread_amount) == 1) {
       
-    }  
-  } else {
+    }  else {
+      fprintf(stderr, "Error: invalid input given!");
+      return EXIT_FAILURE;
+    }
+  } else if (argc == 1) {
 
+  } else {
+    fprintf(stderr, "Error: invalid input given!");
+    return EXIT_FAILURE;
   }
 
   // create_thread(greet), parameter irrelevant
