@@ -93,8 +93,8 @@ int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t number
     int64_t other_number = 0;
 
     int64_t* current_sum = malloc(size * sizeof(int64_t));
-    
-    for (int64_t current_number = 1; current_number < number/2; 
+
+    for (int64_t current_number = 1; current_number <= number/2; 
     current_number = find_next_prime(current_number)) {
         other_number = number - current_number;
         // if both numbers are prime
