@@ -100,6 +100,7 @@ int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const in
 
     // get the position for the operations
     int64_t sum_position = arr -> elements[(arr -> length -> integer) - 1] -> sum_amount;
+    printf("<<<<<%li>>>>\n", (arr -> length -> integer));
 
     // increase sum amount
     arr -> elements[position] -> sum_amount = (arr -> elements[position] -> sum_amount) + 1;
@@ -107,6 +108,8 @@ int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const in
     // increase the amount of space in the array of pointers
     int64_t** sums_buffer = realloc(arr -> elements[position] -> sums, 
     (arr -> elements[position] -> sum_amount) * sizeof(int64_t**));
+
+    printf(">>>>%li<<<<<\n", arr -> elements[position] -> sum_amount);
 
     if (sums_buffer == NULL) {
         return EXIT_FAILURE;
@@ -123,16 +126,17 @@ int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const in
     malloc(sum_element_amount * sizeof(int64_t));
 
     int64_t* pointer_check = sum;
-
+    printf("<%li, %li>\n(", arr -> elements[position] -> number, position);
     for (int32_t sum_element = 0; sum_element < sum_element_amount; sum_element++) {
         if (pointer_check == NULL) { // NOLINT
             return EXIT_FAILURE;
         }
-
+        printf("<%li, %i>", sum_position, sum_element);
         arr -> elements[position] -> sums[sum_position][sum_element] = sum[sum_element];
         pointer_check += (sizeof(int64_t*));
+        
     }
-
+    printf(")\n");
     return EXIT_SUCCESS;
 }
 
@@ -168,9 +172,10 @@ int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size, const 
     if (sum == NULL) {
         return NULL;
     }
-
+    printf(">>%li\n", arr -> elements[num_position] -> sum_amount);
     // copy the sum to the allocated array to be returned
     for (int64_t sum_num = 0; sum_num < *size; sum_num++) {
+        fprintf(stderr, "[%li, %li]", sum_position, sum_num);
         sum[sum_num] = arr -> elements[num_position] -> sums[sum_position][sum_num];
     }
     
