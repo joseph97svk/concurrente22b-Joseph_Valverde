@@ -111,14 +111,10 @@ int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t number
 }
 
 int64_t find_next_prime(const int64_t last_prime) {
-    bool isPrime = false;
     int64_t number = last_prime + 1;
 
-    while (!isPrime) {
-        isPrime = isPrimeNum(number);
-        if (!isPrime) {
-            number+= 1;
-        }
+    while (!isPrimeNum(number)) {
+        number+= 1;
     }
 
     return number;
