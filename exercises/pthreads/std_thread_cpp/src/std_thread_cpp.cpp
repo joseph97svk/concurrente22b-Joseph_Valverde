@@ -3,6 +3,15 @@
 #include <vector>
 #include <sstream>
 #include <memory>
+#include <stdexcept>
+
+enum exceptionError {
+    exitSuccessError,
+    invalidInputError,
+    sharedDataAllocationError, 
+    privateDataAllocationError,
+    threadNotJoinableError,
+};
 
 struct sharedData {
     uint64_t threadCount;
@@ -20,60 +29,114 @@ struct privateData {
     threadNumber (threadNumber), 
     dataShared(dataShared) {}
 
-    privateData(privateData& other):
-    threadNumber(other.threadNumber),
-    dataShared(other.dataShared) {}
 }; 
 
 
-void greet(privateData* privateData);
-int create_threads(std::shared_ptr<sharedData> sharedData);
+void greet(std::shared_ptr<privateData> privateData);
+void create_threads(std::shared_ptr<sharedData> sharedData);
 
 int main (int argc, char* argv[]) {
+    // set default thread values
     uint64_t threadCount = std::thread::hardware_concurrency();
 
-    if (argc == 2) {
-        std::istringstream argumentBuffer(argv[1]);
-        argumentBuffer >> threadCount;
-        
-    } else if (argc > 2) {
-        std::cerr << "Error: invalid input" << std::endl;
-        return EXIT_FAILURE;
-    }   
+    try {
+         // read the arguments 
+        if (argc == 2) {
+            std::istringstream argumentBuffer(argv[1]);
+            argumentBuffer >> threadCount;
+            
+        } else if (argc > 2) {
+            throw invalidInputError;
+        }   
+    } catch (enum exceptionError error) {
+        if (error == invalidInputError) {
+            std::cerr << "Error: invalid input, more than 2 arguments" << std::endl;
+            return (int) error;
+        }
 
-    std::shared_ptr<sharedData> sharedData(new struct sharedData(threadCount));
-
-    int64_t error = create_threads(sharedData);
-
-    std::chrono::high_resolution_clock::now();
-
-    std::cout << "Execution time " << std::endl;
-
-    return error;
-}
-
-int create_threads(std::shared_ptr<sharedData> sharedData) {
-    std::vector <std::thread> threads;
-    threads.reserve(sharedData -> threadCount);
-    std::vector <privateData*> privateData;
-    privateData.reserve(sharedData -> threadCount);
-
-    for (uint64_t thread_number = 0; thread_number < sharedData -> threadCount;
-    ++thread_number) {
-        privateData.emplace_back(new struct privateData(thread_number, sharedData));
-        threads.emplace_back(std::thread(greet, privateData[thread_number]));
     }
+   
+    // run program 
+    try {
+        // start shared data
+        std::shared_ptr<sharedData> sharedData(new struct sharedData(threadCount));
 
-    std::cout << "Hello from main thread" << std::endl;
+        if (sharedData == nullptr) {
+            throw sharedDataAllocationError;
+        }
 
-    for (uint64_t thread_number = 0; thread_number < sharedData -> threadCount;
-    ++thread_number) {
-        threads[thread_number].join();
+        // start timer
+        auto start = std::chrono::high_resolution_clock::now();
+        // create threads
+        create_threads(sharedData);
+
+        // stop timer and report timing
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsedTime = end - start;
+        std::cout << "Execution time: " << elapsedTime.count()  << "s" << std::endl;
+    } catch (enum exceptionError error) {
+        switch (error) {
+        case sharedDataAllocationError:
+            std::cerr << "Error: shared thread data could not be allocated" << std::endl;
+            break;
+
+        case privateDataAllocationError:
+            std::cerr << "Error: private thread data could not be allocated" << std::endl;
+            break;
+        case threadNotJoinableError:
+            std::cerr << "Error: A thread could not be joined or terminated" << std::endl;
+            break;
+        default:
+            std::cerr << "Error: unexpected exception found" << std::endl;
+            break;
+        }
+
+        return (int) error;
     }
+    
     return EXIT_SUCCESS;
 }
 
-void greet(privateData* privateData) {
+void create_threads(std::shared_ptr<sharedData> sharedData) {
+    // create array for threads and allocate space
+    std::vector <std::thread> threads;
+    threads.reserve(sharedData -> threadCount);
+
+    // create array for private Data and allocate space
+    std::vector <std::shared_ptr<privateData>> privateData;
+    privateData.reserve(sharedData -> threadCount);
+
+    // for all threads
+    for (uint64_t thread_number = 0; thread_number < sharedData -> threadCount;
+    ++thread_number) {
+        // add the private data to the array
+        privateData.emplace_back(
+            std::shared_ptr<struct privateData>(
+                new struct privateData(thread_number, sharedData)));
+        if (privateData[thread_number] == nullptr) {
+            throw privateDataAllocationError;
+        } 
+        // add threads to the array
+        threads.emplace_back(std::thread(greet, privateData[thread_number]));
+    }
+
+    // greet from the main thread
+    std::cout << "Hello from main thread" << std::endl;
+
+    // for all threads
+    for (uint64_t thread_number = 0; thread_number < sharedData -> threadCount;
+    ++thread_number) {
+        // check if they can be joined
+        if (!threads[thread_number].joinable()) {
+            throw threadNotJoinableError;
+        }
+        // join the thread
+        threads[thread_number].join();
+    }
+}
+
+void greet(std::shared_ptr<privateData> privateData) {
+    // greet
     std::cout << "Hello from secondary thread " << privateData -> threadNumber << 
     " of " << privateData -> dataShared -> threadCount << std::endl;
 }
