@@ -56,6 +56,7 @@ int32_t goldbach_process_sums(goldbach_arr_t* goldbach_arr) {
     int64_t current_num = 0;
 
     for (int number = 0; number < size; number++) {
+
         current_num = goldbach_get_current_number(goldbach_arr, number);
 
         if (current_num < 0) {
@@ -63,7 +64,7 @@ int32_t goldbach_process_sums(goldbach_arr_t* goldbach_arr) {
         }
 
         if (current_num < 6) {
-            return EXIT_SUCCESS;
+            continue;
         }
 
         if (current_num % 2 == 0) {
@@ -82,16 +83,17 @@ int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr, const int64_t number,
     
     int64_t* current_sum = malloc(size * sizeof(int64_t));
 
-    for (int64_t current_number = 2; current_number <= number/2; 
+    for (int64_t current_number = 2; current_number < number/2; 
     current_number = find_next_prime(current_number)) {
 
         for (int64_t current_second_number = 2; 
-        current_second_number < (number - current_number);
+        current_second_number <= (number - current_number)/2;
         current_second_number = find_next_prime(current_second_number)) {
 
             third_number = number - (current_second_number + current_number);
             //printf("<%li:: %li, %li, %li>", number, current_number, current_second_number, third_number);
-            if (isPrimeNum(third_number)) {
+            if (isPrimeNum(third_number) && third_number >= current_second_number &&
+            current_second_number >= current_number) {
                 current_sum[0] = current_number;
                 current_sum[1] = current_second_number;
                 current_sum[2] = third_number;
@@ -113,13 +115,14 @@ int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t number
 
     int64_t* current_sum = malloc(size * sizeof(int64_t));
 
-    for (int64_t current_number = 1; current_number <= number/2; 
+    for (int64_t current_number = 2; current_number <= number/2; 
     current_number = find_next_prime(current_number)) {
         other_number = number - current_number;
         // if both numbers are prime
         if (isPrimeNum(other_number)) {
             current_sum[0] = current_number;
             current_sum[1] = other_number;
+            
             goldbach_add_sum(goldbach_arr, current_sum, position);
         }
     } 
@@ -161,26 +164,42 @@ void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
     int64_t size = 0, sum_amount = 0;
     int64_t* current_sum;
 
-
+    // for each number 
     for (int64_t num = 0; num < goldbach_get_arr_length(goldbach_arr); num++) {
         int64_t current_num = goldbach_get_current_number(goldbach_arr, num);
 
-        printf("%li: ", current_num);
-
         sum_amount = goldbach_get_sums_amount(goldbach_arr, num);
 
-        for (int64_t sum_in_num = 0; sum_in_num < sum_amount; sum_in_num++) {
-            
-            if (current_num < 0) {
+        printf("%li: ", current_num);
+
+        if (sum_amount == 0) {
+            printf("NA\n");
+            continue;
+        } else {
+            printf("%li sums", sum_amount);
+        }
+
+        if (current_num < 0) {
+            printf(": ");
+
+            for (int64_t sum_in_num = 0; sum_in_num < sum_amount; sum_in_num++) {
                 current_sum = goldbach_get_sum(goldbach_arr, &size, num, sum_in_num);
 
                 for (int64_t sum_element = 0; sum_element < size; ++sum_element) {
-                    printf("%" PRId64 " ", current_sum[sum_element]);
+                    printf("%" PRId64 "", current_sum[sum_element]);
+                    if (sum_element != size -1) {
+                        printf(" + ");
+                    }
                 }
 
                 free(current_sum);
+
+                if (sum_in_num != sum_amount - 1) {
+                    printf(", ");
+                }
             }
         }
+
         printf("\n");
     }
 }

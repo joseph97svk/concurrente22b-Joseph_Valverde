@@ -131,7 +131,7 @@ void* player_shoot (void* data) {
 
     int64_t* id_info = (int64_t*) data;
 
-    u_int32_t seed = (u_int32_t)(id_info[1] + id_info[0]); 
+    int32_t seed = (int32_t)(id_info[1] + id_info[0]); 
 
     for (int try = 0; try < 3; ++try) {
         seed++;
