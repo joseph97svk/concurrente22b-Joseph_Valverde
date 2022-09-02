@@ -6,8 +6,6 @@ typedef struct goldbach_arr goldbach_arr_t;
 
 goldbach_arr_t* goldbach_arr_create();
 
-int32_t goldbach_arr_init(goldbach_arr_t* arr);
-
 int32_t goldbach_add_num(goldbach_arr_t* arr, const int64_t num); 
 
 int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const int64_t position);
@@ -29,5 +27,5 @@ int64_t goldbach_get_sums_amount(goldbach_arr_t* arr, const int64_t position);
  */
 int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size, const int64_t num_position, const int64_t sum_position);
 
-void goldbach_delete_arr(goldbach_arr_t* arr);
+void goldbach_arr_destroy(goldbach_arr_t* arr);
 

@@ -11,9 +11,6 @@ int main(void) {
     if (goldbach_arr == NULL) {
         return EXIT_FAILURE;
     }
-
-    // initialize goldbach_arr
-    goldbach_arr_init(goldbach_arr);
        
     // read values into it
     if (goldbach_read_numbers(goldbach_arr) == EXIT_SUCCESS) {
@@ -26,6 +23,8 @@ int main(void) {
     } else {
         printf("Invalid value read\n");
     }
+
+    goldbach_arr_destroy(goldbach_arr);
     
     return EXIT_SUCCESS;
 }
