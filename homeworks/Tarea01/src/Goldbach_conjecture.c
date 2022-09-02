@@ -78,10 +78,29 @@ int32_t goldbach_process_sums(goldbach_arr_t* goldbach_arr) {
 
 int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr, const int64_t number, const int64_t position) {
     const int32_t size = 3;
-
+    int64_t third_number = 0;
+    
     int64_t* current_sum = malloc(size * sizeof(int64_t));
 
-    
+    for (int64_t current_number = 2; current_number <= number/2; 
+    current_number = find_next_prime(current_number)) {
+
+        for (int64_t current_second_number = 2; 
+        current_second_number < (number - current_number);
+        current_second_number = find_next_prime(current_second_number)) {
+
+            third_number = number - (current_second_number + current_number);
+            //printf("<%li:: %li, %li, %li>", number, current_number, current_second_number, third_number);
+            if (isPrimeNum(third_number)) {
+                current_sum[0] = current_number;
+                current_sum[1] = current_second_number;
+                current_sum[2] = third_number;
+
+                //printf("(%li:: %li, %li, %li)", number, current_number, current_second_number, third_number);
+                goldbach_add_sum(goldbach_arr, current_sum, position);
+            }
+        }
+    }
 
     free (current_sum);
 
@@ -127,7 +146,7 @@ bool isPrimeNum (const int64_t number) {
         return true;
     } 
 
-    if (number % 2 == 0) {
+    if (number % 2 == 0 || number == 1) {
         return false;
     }
 
