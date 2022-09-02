@@ -2,16 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct goldbach_element {
+typedef struct goldbach_element {
     int64_t number;
     int64_t sum_amount;
     int64_t** sums;
-};
-
-typedef struct goldbach_element goldbach_element_t;
+} goldbach_element_t;
 
 struct goldbach_arr {
-    int64_t length;
+    int64_t capacity;   // amount of space available
+    int64_t count; // amount of contents 
     goldbach_element_t* elements;
 };
 
@@ -23,10 +22,21 @@ goldbach_arr_t* goldbach_arr_create() {
     // allocate
     goldbach_arr_t* new_goldbach_arr = malloc(sizeof(goldbach_arr_t));
 
-    // initialize
-    new_goldbach_arr -> length = 0;
-    new_goldbach_arr -> elements = malloc(1);
+    if (new_goldbach_arr != NULL) {
+        // initialize
+        new_goldbach_arr -> count = 0;
+        new_goldbach_arr -> capacity = 10;
+        new_goldbach_arr -> elements = calloc(new_goldbach_arr -> capacity, sizeof(goldbach_element_t));
 
+        /* if memory for elements could not be allocated, the goldbach arr creation
+        * was not succesful, then free allocated space and return null
+        */
+        if (new_goldbach_arr -> elements == NULL) {
+            free(new_goldbach_arr);
+            new_goldbach_arr = NULL;
+        }
+    }
+    
     return new_goldbach_arr;
 }
 
@@ -49,29 +59,35 @@ void delete_goldbach_element(goldbach_element_t* element){
 
 int32_t goldbach_add_num(goldbach_arr_t* arr, const int64_t num) {
     if (arr -> elements == NULL) {
-        arr -> elements = malloc(sizeof (goldbach_element_t));
-    } else {
-        arr -> elements =  realloc(arr -> elements, ((arr -> length) + 1) * sizeof (goldbach_element_t));
+       arr = goldbach_arr_create();
+    } else if (arr -> capacity == arr -> count) {
+        // increase the count
+        arr -> capacity = arr -> capacity + 10;
+
+        // reallocate memory according to new capacity
+        arr -> elements = realloc(arr -> elements, 
+        ((arr -> capacity)) * sizeof (goldbach_element_t));
     }
 
     if (arr -> elements == NULL) {
+        goldbach_arr_destroy(arr);
         return EXIT_FAILURE;
     }
 
-    goldbach_element_init(&(arr -> elements)[arr -> length]);
+    goldbach_element_init(&(arr -> elements)[arr -> count]);
 
     // set the number
-    (arr -> elements)[arr -> length].number = num;
+    (arr -> elements)[arr -> count].number = num;
 
-    // increase the length of the array
-    arr -> length = (arr -> length) + 1;
+    // increase the count of the array
+    arr -> count = (arr -> count) + 1;
 
     return EXIT_SUCCESS;
 }
 
 int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const int64_t position) {   
 
-    if (position >= arr -> length|| sum == NULL) {
+    if (position >= arr -> count|| sum == NULL) {
         return EXIT_FAILURE;
     }
 
@@ -130,7 +146,7 @@ int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const in
 }
 
 int64_t goldbach_get_arr_length(goldbach_arr_t* arr) {
-    return arr -> length;
+    return arr -> count;
 }
 
 int64_t goldbach_get_current_number(goldbach_arr_t* arr, const int64_t position) {
@@ -141,9 +157,10 @@ int64_t goldbach_get_sums_amount(goldbach_arr_t* arr, const int64_t position) {
     return arr -> elements[position].sum_amount;
 }
 
+/// memory must be freed 
 int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size, const int64_t num_position, const int64_t sum_position) {
     // if out of bounds, then return null pointer
-    if (num_position > arr -> length) {
+    if (num_position > arr -> count) {
         return NULL;
     }
 
@@ -177,5 +194,25 @@ int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size, const 
 
 // goldbach_arr_destroy
 void goldbach_arr_destroy(goldbach_arr_t* arr) {
-    free(arr);
+    for (int64_t element = 0; element < arr -> capacity; element++) {
+        for (int64_t sum = 0; sum < arr -> elements[element].sum_amount; sum++) {
+            if (arr -> elements[element].sums[sum] != NULL) {
+                free(arr -> elements[element].sums[sum]);
+            }
+        }
+
+        if (arr -> elements[element].sums != NULL) {
+            fprintf("[%lu]\n", arr -> elements[element].sums);
+            free(arr -> elements[element].sums);
+        }
+    }
+
+    if (arr -> elements != NULL) {
+        free(arr -> elements);
+    }
+
+    if (arr != NULL) {
+        free(arr);
+    }
+
 }
