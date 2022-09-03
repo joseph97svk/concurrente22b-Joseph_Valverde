@@ -8,6 +8,14 @@
 
 #include "Goldbach_conjecture.h"
 
+/**
+ * @brief 
+ * 
+ * @param string 
+ * @param value 
+ * @return true 
+ * @return false 
+ */
 bool num_validity_check(char string[64], int64_t* value);
 
 int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t num, const int64_t position);
@@ -23,22 +31,21 @@ int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr) {
     char input_read[64];
     int64_t current_val_read = 0;
 
-
     // while numbers are being read 
-    while (scanf("%63s[^\n]", input_read)) {
-        if (input_read[0] == 'n') {
+    while (fgets(input_read, sizeof(input_read), stdin) != NULL) {
+        if (input_read[0] == '\n') {
             return EXIT_SUCCESS;
         }
 
         int erase_space = strlen(input_read);        
-
+    
         // check if input is valid
         if (num_validity_check(input_read, &current_val_read)) {
             // if valid, add them 
             goldbach_add_num(goldbach_arr, current_val_read);
         } else {
             // if not valid, report so
-            return EXIT_FAILURE;
+            return error_invalid_input_given;
         }
 
         //ensure all values on input space to be 0 for next run
@@ -51,7 +58,7 @@ int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr) {
 }
 
 int32_t goldbach_process_sums(goldbach_arr_t* goldbach_arr) {
-    int64_t size = goldbach_get_arr_length(goldbach_arr);
+    int64_t size = goldbach_get_arr_count(goldbach_arr);
 
     int64_t current_num = 0;
 
@@ -91,14 +98,13 @@ int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr, const int64_t number,
         current_second_number = find_next_prime(current_second_number)) {
 
             third_number = number - (current_second_number + current_number);
-            //printf("<%li:: %li, %li, %li>", number, current_number, current_second_number, third_number);
+            
             if (isPrimeNum(third_number) && third_number >= current_second_number &&
             current_second_number >= current_number) {
                 current_sum[0] = current_number;
                 current_sum[1] = current_second_number;
                 current_sum[2] = third_number;
 
-                //printf("(%li:: %li, %li, %li)", number, current_number, current_second_number, third_number);
                 goldbach_add_sum(goldbach_arr, current_sum, position);
             }
         }
@@ -164,8 +170,11 @@ void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
     int64_t size = 0, sum_amount = 0;
     int64_t* current_sum;
 
+    printf("Total: %li numbers %li sums\n\n", goldbach_get_arr_count(goldbach_arr), 
+    goldbach_arr_get_total_sums_amount(goldbach_arr));
+
     // for each number 
-    for (int64_t num = 0; num < goldbach_get_arr_length(goldbach_arr); num++) {
+    for (int64_t num = 0; num < goldbach_get_arr_count(goldbach_arr); num++) {
         int64_t current_num = goldbach_get_current_number(goldbach_arr, num);
 
         sum_amount = goldbach_get_sums_amount(goldbach_arr, num);
@@ -199,7 +208,6 @@ void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
                 }
             }
         }
-
         printf("\n");
     }
 }
@@ -209,16 +217,20 @@ bool num_validity_check(char string[64], int64_t* value) {
 
     char* end_ptr;
 
+    // if the first char is not a number
     if (string[0] < 48 || string[0] > 57) {
-
+        
+        // if the first char if not num also not a minus
         if (string[0] != '-') {
             return false;
+        // otherwise if is minus but is only that
         } else if (strlen(string) == 1) {
             return false;
         }
     }
 
-    for (size_t character = 1; character < strlen(string); character++) {
+    // begin checking at second char if it is num (first already checked)
+    for (size_t character = 1; character < strlen(string) - 1; character++) {
         if (string[character] < 48 || string[character] > 57) {
             return false;
         }
