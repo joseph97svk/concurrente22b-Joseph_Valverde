@@ -2,4 +2,9 @@ Utilizando los argumentos en línea de comandos, ubique la cantidad máxima de t
 
 MAX Threads according to (ulimit -u): 63287
 
+Mensaje utilizando hello_iw_pri: "Hello from secondary thread 32752 of 64000"
+
+Maximo permitido ejecutando con el sistema: 3275
+
+
 Sistema Operativo: Pop!_OS 22.04 LTSs
