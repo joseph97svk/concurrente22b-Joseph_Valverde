@@ -69,13 +69,13 @@ Design of the solution that is implemented.
 
 Data structure here
 
-[#img-design/diagrama de memoria.png]
-image::design/diagrama de memoria.png[]
+[#img-design/Diagrama de memoria.png]
+image::design/Diagrama de memoria.png[]
 
 Descripcion de diagrama de memoria
 
-[#img-design/c0117-T1.png]
-image::design/c0117-T1.png[]
+[#img-design/C0117-T1.png]
+image::design/C0117-T1.png[]
 
 Descripcion de diagrama UML
 
