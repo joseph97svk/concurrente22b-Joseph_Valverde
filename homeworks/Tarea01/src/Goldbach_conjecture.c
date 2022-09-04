@@ -416,7 +416,7 @@ bool num_validity_check(char string[64], int64_t* value) {
     }
 
     // change input to number
-    int64_t number = strtol(string, &end_ptr, 10);
+    int64_t number = strtol(string, &end_ptr, 10); //NOLINT
 
     // check if there was an overflow
     if (errno != 0) {
