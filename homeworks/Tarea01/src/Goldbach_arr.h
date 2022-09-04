@@ -1,3 +1,4 @@
+// Copyright 2022 Joseph Valverde <joseph.valverdekong@ucr.ac.cr>
 #include <stdint.h>
 
 /**
@@ -11,7 +12,7 @@ enum golbach_arr_error {
     error_adding_sum_sums_memory_allocation_failure,
     error_adding_sum_current_sum_memory_allocation_failure,
     error_adding_sum_provided_sum_invalid_size,
-}; 
+};
 
 /**
  * @brief Dynamic array holding the numbers and sums (once processed)
@@ -44,7 +45,7 @@ goldbach_arr_t* goldbach_arr_create();
  * @param num that will be stored in goldbach_arr
  * @return int32_t success-error state
  */
-int32_t goldbach_add_num(goldbach_arr_t* arr, const int64_t num); 
+int32_t goldbach_add_num(goldbach_arr_t* arr, const int64_t num);
 
 /**
  * @brief Adds an array of the numbers of an addition
@@ -57,7 +58,7 @@ int32_t goldbach_add_num(goldbach_arr_t* arr, const int64_t num);
  * note: Invalid positions will return error and nothing will be copied
  * @return int32_t success-error state
  */
-int32_t goldbach_add_sum(goldbach_arr_t* arr, 
+int32_t goldbach_add_sum(goldbach_arr_t* arr,
 const int64_t* const sum, const int64_t position);
 
 /**
@@ -105,7 +106,7 @@ int64_t goldbach_arr_get_total_sums_amount(goldbach_arr_t* arr);
  * @param sum_position position from among the sums for the given number
  * @return int* 
  */
-int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size, 
+int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size,
 const int64_t num_position, const int64_t sum_position);
 
 /**

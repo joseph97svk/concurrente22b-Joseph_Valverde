@@ -1,3 +1,5 @@
+// Copyright 2022 Joseph Valverde <joseph.valverdekong@ucr.ac.cr>
+
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,7 +28,7 @@ bool num_validity_check(char string[64], int64_t* value);
  * @param position position within the goldbach_arr of the number
  * @return int32_t 
  */
-int32_t goldbach_process_num (goldbach_arr_t* goldbach_arr, const int64_t number, const int64_t position);
+int32_t goldbach_process_num(goldbach_arr_t* goldbach_arr, const int64_t number, const int64_t position);
 
 /**
  * @brief processes an odd number according to the goldbach conjecture
@@ -69,7 +71,7 @@ int64_t find_next_prime(const int64_t last_prime);
  * @return true if the number is prime
  * @return false if the number is not prime
  */
-bool isPrimeNum (const int64_t number);
+bool isPrimeNum(const int64_t number);
 
 /**
  * @brief reads the input to the console and adds them to the 
@@ -87,17 +89,17 @@ int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr) {
 
     int32_t number_addition_error = EXIT_SUCCESS;
 
-    // while numbers are being read 
+    // while numbers are being read
     while (fgets(input_read, sizeof(input_read), stdin) != NULL) {
         if (input_read[0] == '\n') {
             return EXIT_SUCCESS;
         }
 
-        int32_t erase_space = strlen(input_read);        
-    
+        int32_t erase_space = strlen(input_read);
+
         // check if input is valid
         if (num_validity_check(input_read, &current_val_read)) {
-            // if valid, add them 
+            // if valid, add them
             number_addition_error = goldbach_add_num(goldbach_arr, current_val_read);
 
             if (number_addition_error != EXIT_SUCCESS) {
@@ -108,7 +110,7 @@ int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr) {
             return error_invalid_input_given;
         }
 
-        //ensure all values on input space to be 0 for next run
+        // ensure all values on input space to be 0 for next run
         for (int32_t character = 0; character < erase_space; character++) {
             input_read[character] = '0';
         }
@@ -133,7 +135,6 @@ int32_t goldbach_process_sums(goldbach_arr_t* goldbach_arr) {
 
     // for all elements/numbers in a goldbach_arr
     for (int64_t number = 0; number < size; number++) {
-
         current_num = goldbach_get_current_number(goldbach_arr, number);
         // process the given number
         num_process_error = goldbach_process_num(goldbach_arr, current_num, number);
@@ -154,7 +155,7 @@ int32_t goldbach_process_sums(goldbach_arr_t* goldbach_arr) {
  * @param position position within the goldbach_arr of the number
  * @return int32_t 
  */
-int32_t goldbach_process_num (goldbach_arr_t* goldbach_arr, const int64_t number, const int64_t position) {
+int32_t goldbach_process_num(goldbach_arr_t* goldbach_arr, const int64_t number, const int64_t position) {
     int64_t current_num = number;
     int32_t num_process_error = EXIT_SUCCESS;
     // if the number is negative, then make it positive
@@ -189,22 +190,20 @@ int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr, const int64_t number,
     const int32_t size = 3;
     int64_t third_number = 0;
     int32_t num_process_error = EXIT_SUCCESS;
-    
+
     // allocate space for the sum
     int64_t* current_sum = malloc(size * sizeof(int64_t));
 
     // for each number less than half the given number
-    for (int64_t current_number = 2; current_number < number/2; 
+    for (int64_t current_number = 2; current_number < number/2;
     current_number = find_next_prime(current_number)) {
-
         // for each number less than the number minus the current number by half
-        for (int64_t current_second_number = 2; 
+        for (int64_t current_second_number = 2;
         current_second_number <= (number - current_number)/2;
         current_second_number = find_next_prime(current_second_number)) {
-
             // find a third number (the number minus the current number and the second current number)
             third_number = number - (current_second_number + current_number);
-            
+
             // check if the number if prime and valid
             if (isPrimeNum(third_number) && third_number >= current_second_number &&
             current_second_number >= current_number) {
@@ -219,7 +218,7 @@ int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr, const int64_t number,
     }
 
     // free allocated space
-    free (current_sum);
+    free(current_sum);
 
     return num_process_error;
 }
@@ -242,7 +241,7 @@ int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t number
     int64_t* current_sum = malloc(size * sizeof(int64_t));
 
     // for each current number less than half the given number
-    for (int64_t current_number = 2; current_number <= number/2; 
+    for (int64_t current_number = 2; current_number <= number/2;
     current_number = find_next_prime(current_number)) {
         // define a other_number (given number - current_number)
         other_number = number - current_number;
@@ -252,13 +251,13 @@ int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t number
             // add to goldbach_arr
             current_sum[0] = current_number;
             current_sum[1] = other_number;
-            
+
             num_process_error = goldbach_add_sum(goldbach_arr, current_sum, position);
         }
-    } 
+    }
 
     // free allocated memory space
-    free (current_sum);
+    free(current_sum);
 
     return num_process_error;
 }
@@ -299,13 +298,13 @@ int64_t find_next_prime(const int64_t last_prime) {
  * @return true if the number is prime
  * @return false if the number is not prime
  */
-bool isPrimeNum (const int64_t number) {
+bool isPrimeNum(const int64_t number) {
     int64_t comparator = 5;
 
     // check if number is two or three
     if (number == 2 || number == 3) {
         return true;
-    } 
+    }
 
     // check if number is 1, even or divisible by 3
     if (number % 2 == 0 || number %3 == 0 || number == 1) {
@@ -313,13 +312,13 @@ bool isPrimeNum (const int64_t number) {
     }
 
     // while not divisible by comparator number and within limits
-    while (number % comparator != 0 
-    && number % (comparator + 2) != 0 
+    while (number % comparator != 0
+    && number % (comparator + 2) != 0
     && comparator*comparator <= number) {
         // check all numbers every 6
         comparator += 6;
     }
-    
+
     // number is prime if reached comparator is less than limit
     return comparator * comparator > number;
 }
@@ -335,26 +334,26 @@ void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
     int64_t* current_sum;
 
     // print totals
-    printf("Total: %li numbers %li sums\n\n", goldbach_get_arr_count(goldbach_arr), 
+    printf("Total: %" PRId64 " numbers %" PRId64 " sums\n\n", goldbach_get_arr_count(goldbach_arr),
     goldbach_arr_get_total_sums_amount(goldbach_arr));
 
-    // for each number 
+    // for each number
     for (int64_t num = 0; num < goldbach_get_arr_count(goldbach_arr); num++) {
         int64_t current_num = goldbach_get_current_number(goldbach_arr, num);
 
         // print sums amount
         sum_amount = goldbach_get_sums_amount(goldbach_arr, num);
 
-        printf("%li: ", current_num);
+        printf("%" PRId64 ": ", current_num);
 
         // if none, print accordingly
         if (sum_amount == 0) {
             printf("NA\n");
             continue;
-        } else {  //otherwise print sums amount
-            printf("%li sums", sum_amount);
+        } else {  // otherwise print sums amount
+            printf("%" PRId64 " sums", sum_amount);
         }
-        
+
         // check if sums need to be printed
         if (current_num < 0) {
             printf(": ");
@@ -398,7 +397,6 @@ bool num_validity_check(char string[64], int64_t* value) {
 
     // if the first char is not a number
     if (string[0] < 48 || string[0] > 57) {
-        
         // if the first char is not num, and also not a minus
         if (string[0] != '-') {
             return false;

@@ -1,3 +1,4 @@
+// Copyright 2022 Joseph Valverde <joseph.valverdekong@ucr.ac.cr>
 #include "Goldbach_arr.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,9 +11,9 @@
  * The array holding the sums
  */
 typedef struct goldbach_element {
-    int64_t number; // the number
-    int64_t sum_amount; // amount of sums found
-    int64_t** sums; // 2D array of the sums 
+    int64_t number;  // the number
+    int64_t sum_amount;  // amount of sums found
+    int64_t** sums;  // 2D array of the sums
 } goldbach_element_t;
 
 /**
@@ -21,9 +22,9 @@ typedef struct goldbach_element {
  */
 struct goldbach_arr {
     int64_t capacity;   // amount of space available
-    int64_t count; // amount of contents 
-    int64_t total_sums_amount; // sums between all elements in arr
-    goldbach_element_t* elements; // the elements with their numbers
+    int64_t count;  // amount of contents
+    int64_t total_sums_amount;  // sums between all elements in arr
+    goldbach_element_t* elements;  // the elements with their numbers
 };
 
 /**
@@ -64,7 +65,7 @@ goldbach_arr_t* goldbach_arr_create() {
             new_goldbach_arr = NULL;
         }
     }
-    
+
     return new_goldbach_arr;
 }
 
@@ -78,7 +79,7 @@ int32_t goldbach_element_init(goldbach_element_t* element) {
     // initialize values
     element -> number = 0;
     element -> sum_amount = 0;
-    element -> sums = malloc(1); //get an address
+    element -> sums = malloc(1);  // get an address
 
     if (element -> sums == NULL) {
         fprintf(stderr, "Error: memory could not be allocated");
@@ -93,8 +94,8 @@ int32_t goldbach_element_init(goldbach_element_t* element) {
  * @details frees allocated memory for the given element
  * @param element element to be deleted
  */
-void delete_goldbach_element(goldbach_element_t* element){ 
-    free (element -> sums);
+void delete_goldbach_element(goldbach_element_t* element) {
+    free(element -> sums);
 }
 
 /**
@@ -113,7 +114,7 @@ int32_t goldbach_add_num(goldbach_arr_t* arr, const int64_t num) {
         arr -> capacity = arr -> capacity + 10;
 
         // reallocate memory according to new capacity
-        arr -> elements = realloc(arr -> elements, 
+        arr -> elements = realloc(arr -> elements,
         ((arr -> capacity)) * sizeof (goldbach_element_t));
     }
 
@@ -147,7 +148,7 @@ int32_t goldbach_add_num(goldbach_arr_t* arr, const int64_t num) {
  * note: Invalid positions will return error and nothing will be copied
  * @return int32_t success-error state
  */
-int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const int64_t position) {   
+int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const int64_t position) {
     // check is parameters are correct
     if (position >= arr -> count|| sum == NULL) {
         return error_adding_sum_failure_invalid_position_or_given_sum;
@@ -170,7 +171,7 @@ int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const in
     arr -> elements[position].sum_amount = (arr -> elements[position].sum_amount) + 1;
 
     // increase the amount of space in the array of pointers
-    int64_t** sums_buffer = realloc(arr -> elements[position].sums, 
+    int64_t** sums_buffer = realloc(arr -> elements[position].sums,
     (arr -> elements[position].sum_amount) * sizeof(int64_t**));
 
     // if memory for sums could not be allocted, report failure
@@ -188,9 +189,9 @@ int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const in
     if (arr -> elements[position].number % 2 == 0) {
         sum_element_amount = 2;
     }
-    
+
     // allocate the space in the given pointer
-    arr -> elements[position].sums[sum_position] = 
+    arr -> elements[position].sums[sum_position] =
     malloc(sum_element_amount * sizeof(int64_t));
 
     // if memory for a given sum could not be allocated, report failure
@@ -199,20 +200,19 @@ int32_t goldbach_add_sum(goldbach_arr_t* arr, const int64_t* const sum, const in
     }
 
     const int64_t* pointer_check = sum;
-    
+
     // for all numbers  in a sum
     for (int32_t sum_element = 0; sum_element < sum_element_amount; sum_element++) {
         // check if the pointer was correctly allocted
         if (pointer_check == NULL) { // NOLINT
             return error_adding_sum_provided_sum_invalid_size;
         }
-        
+
         // add the numbers from the given sum to the element sums array
         arr -> elements[position].sums[sum_position][sum_element] = sum[sum_element];
         pointer_check += (sizeof(int64_t*));
-        
     }
-    
+
     (arr -> total_sums_amount) += 1;
     return EXIT_SUCCESS;
 }
@@ -281,7 +281,8 @@ int64_t goldbach_arr_get_total_sums_amount(goldbach_arr_t* arr) {
  * @param sum_position position from among the sums for the given number
  * @return int* 
  */
-int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size, const int64_t num_position, const int64_t sum_position) {
+int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size,
+const int64_t num_position, const int64_t sum_position) {
     // if out of bounds, then return null pointer
     if (num_position > arr -> count) {
         return NULL;
@@ -306,12 +307,12 @@ int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size, const 
     if (sum == NULL) {
         return NULL;
     }
-    
+
     // copy the sum to the allocated array to be returned
     for (int64_t sum_num = 0; sum_num < *size; sum_num++) {
         sum[sum_num] = arr -> elements[num_position].sums[sum_position][sum_num];
     }
-    
+
     return sum;
 }
 
