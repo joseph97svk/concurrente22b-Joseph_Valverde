@@ -60,7 +60,11 @@ int64_t find_next_prime(const int64_t last_prime);
 
 /**
  * @brief checks if a given number is prime
+ * @details based on the primality test algorithm in
+ * https://en.wikipedia.org/wiki/Primality_test
  * 
+ * Based on the principle where all prime numbers greater than 3
+ * can be representad as 6k + 1
  * @param number the number to be checked
  * @return true if the number is prime
  * @return false if the number is not prime
@@ -286,32 +290,38 @@ int64_t find_next_prime(const int64_t last_prime) {
 
 /**
  * @brief checks if a given number is prime
+ * @details based on the primality test algorithm in
+ * https://en.wikipedia.org/wiki/Primality_test
  * 
+ * Based on the principle where all prime numbers greater than 3
+ * can be representad as 6k + 1
  * @param number the number to be checked
  * @return true if the number is prime
  * @return false if the number is not prime
  */
 bool isPrimeNum (const int64_t number) {
-    int64_t comparator = 3, limit = number/2;
+    int64_t comparator = 5;
 
-    // check if number is two
-    if (number == 2) {
+    // check if number is two or three
+    if (number == 2 || number == 3) {
         return true;
     } 
 
-    // check if number is even or is 1
-    if (number % 2 == 0 || number == 1) {
+    // check if number is 1, even or divisible by 3
+    if (number % 2 == 0 || number %3 == 0 || number == 1) {
         return false;
     }
 
     // while not divisible by comparator number and within limits
-    while (number % comparator != 0  && comparator <= limit) {
-        // check all odd numbers
-        comparator += 2;
+    while (number % comparator != 0 
+    && number % (comparator + 2) != 0 
+    && comparator*comparator <= number) {
+        // check all numbers every 6
+        comparator += 6;
     }
     
-    // number is prime if reached comparator is less than the number/2
-    return comparator >= limit;
+    // number is prime if reached comparator is less than limit
+    return comparator * comparator > number;
 }
 
 /**
