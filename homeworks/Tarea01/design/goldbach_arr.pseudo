@@ -88,7 +88,6 @@ goldbach_arr_destroy()
         for all sums in the given element
             free each sum
         free the sums from the given element
-
     free the elements array from goldbach_arr
     free goldbach_arr
 

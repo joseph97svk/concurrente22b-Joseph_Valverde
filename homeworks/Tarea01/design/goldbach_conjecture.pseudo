@@ -109,7 +109,6 @@ goldbach_print_sums()
             print NA
         otherwise 
             print amount of sums
-
         if a number is less than 0
             print all sums
 
