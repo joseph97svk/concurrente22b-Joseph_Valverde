@@ -87,7 +87,7 @@ int64_t goldbach_get_sums_amount(goldbach_arr_t* arr, const int64_t position);
 
 /**
  * @brief returns the total amount of sums stored among all the numbers in the array
- * @param arr @see goldbach_array
+ * @see goldbach_array for arr param
  * @return int64_t 
  */
 int64_t goldbach_arr_get_total_sums_amount(goldbach_arr_t* arr);
