@@ -334,8 +334,8 @@ void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
     int64_t* current_sum;
 
     // print totals
-    printf("Total: %" PRId64 " numbers %" PRId64 " sums\n\n", goldbach_get_arr_count(goldbach_arr),
-    goldbach_arr_get_total_sums_amount(goldbach_arr));
+    /* printf("Total: %" PRId64 " numbers %" PRId64 " sums\n\n", goldbach_get_arr_count(goldbach_arr),
+    goldbach_arr_get_total_sums_amount(goldbach_arr)); */
 
     // for each number
     for (int64_t num = 0; num < goldbach_get_arr_count(goldbach_arr); num++) {
