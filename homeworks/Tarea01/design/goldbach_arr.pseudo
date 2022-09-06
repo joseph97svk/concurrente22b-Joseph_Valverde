@@ -44,14 +44,11 @@ goldbach_add_sum()
     get the position for the operations
     increase sum amount
     increase the amount of space for sums in the given element
-
     if number added is even
         sum_length = 2
     else 
         sum_length = 3
-
     allocate space for the new sum
-
     for all numbers in the sum
         copy the numbers from the given sum into the element sums
     
@@ -82,7 +79,6 @@ goldbach_get_sum()
     allocate space for sum to be returned
     copy from the sum in the element at the given position of the goldbach_arr 
     into the sum to be returned
-
     return the sum
 
 
