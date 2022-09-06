@@ -25,12 +25,9 @@ validity_check()
             return false
         
     convert the input to a num
-
     if there is an error
         return false
-    
     set value
-
     return true
 
 
