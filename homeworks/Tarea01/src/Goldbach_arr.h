@@ -40,7 +40,6 @@ goldbach_arr_t* goldbach_arr_create();
 
 /**
  * @brief Adds a number to dynamic array goldbach_arr
- * 
  * @param arr where the number will be stored
  * @param num that will be stored in goldbach_arr
  * @return int32_t success-error state
@@ -63,7 +62,6 @@ const int64_t* const sum, const int64_t position);
 
 /**
  * @brief returns the count of elements or numbers in arr
- * 
  * @param arr goldbach array of numbers and processed sums
  * @return int64_t 
  */
@@ -89,7 +87,6 @@ int64_t goldbach_get_sums_amount(goldbach_arr_t* arr, const int64_t position);
 
 /**
  * @brief returns the total amount of sums stored among all the numbers in the array
- * 
  * @param arr @see goldbach_array
  * @return int64_t 
  */
@@ -111,7 +108,6 @@ const int64_t num_position, const int64_t sum_position);
 
 /**
  * @brief deallocates all memory allocated for goldbach_arr
- * 
  * @param arr @see goldbach_arr
  */
 void goldbach_arr_destroy(goldbach_arr_t* arr);

@@ -43,9 +43,9 @@ int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr, const int64_t num, co
 /**
  * @brief processes an even number according to the goldbach conjecture
  * 
- * @param goldbach_arr @see goldbach_process_num
- * @param num @see goldbach_process_num
- * @param position @see goldbach_process_num
+ * @param goldbach_arr @see goldbach_process_num()
+ * @param num @see goldbach_process_num()
+ * @param position @see goldbach_process_num()
  * @return int32_t 
  */
 int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t num, const int64_t position);
@@ -182,7 +182,7 @@ int32_t goldbach_process_num(goldbach_arr_t* goldbach_arr, const int64_t number,
  * @brief processes an odd number according to the goldbach conjecture
  * 
  * @param goldbach_arr @see goldbach_process_num
- * @param num @see goldbach_process_num
+ * @param number @see goldbach_process_num
  * @param position @see goldbach_process_num
  * @return int32_t 
  */
@@ -226,9 +226,9 @@ int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr, const int64_t number,
 /**
  * @brief processes an even number according to the goldbach conjecture
  * 
- * @param goldbach_arr @see goldbach_process_num
- * @param num @see goldbach_process_num
- * @param position @see goldbach_process_num
+ * @param goldbach_arr @see goldbach_process_num()
+ * @param number @see goldbach_process_num()
+ * @param position @see goldbach_process_num()
  * @return int32_t 
  */
 int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr, const int64_t number, const int64_t position) {

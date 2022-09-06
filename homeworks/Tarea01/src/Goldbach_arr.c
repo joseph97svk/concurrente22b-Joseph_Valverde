@@ -18,7 +18,7 @@ typedef struct goldbach_element {
 
 /**
  * @brief Dynamic array holding goldbach_elements
- * @see goldbach_arr
+ * @see goldbach_arr()
  */
 struct goldbach_arr {
     int64_t capacity;   // amount of space available
@@ -44,7 +44,7 @@ void delete_goldbach_element(goldbach_element_t* element);
 
 /**
  * @brief 
- * @see golbach_arr_create
+ * @see golbach_arr_create()
  */
 goldbach_arr_t* goldbach_arr_create() {
     // allocate
@@ -248,7 +248,7 @@ int64_t goldbach_get_current_number(goldbach_arr_t* arr, const int64_t position)
 /**
  * @brief returns the amount of sums located in a given position of arr
  * @details invalid position will return -1
- * @param arr @see goldbach_array
+ * @param arr @see goldbach_array()
  * @param position of number whose sums amount is to be fetched
  * @return int64_t 
  */
@@ -263,7 +263,7 @@ int64_t goldbach_get_sums_amount(goldbach_arr_t* arr, const int64_t position) {
 /**
  * @brief returns the total amount of sums stored among all the numbers in the array
  * 
- * @param arr @see goldbach_array
+ * @param arr @see goldbach_array()
  * @return int64_t 
  */
 int64_t goldbach_arr_get_total_sums_amount(goldbach_arr_t* arr) {
@@ -319,7 +319,7 @@ const int64_t num_position, const int64_t sum_position) {
 /**
  * @brief deallocates all memory allocated for goldbach_arr
  * 
- * @param arr @see goldbach_arr
+ * @param arr @see goldbach_arr()
  */
 void goldbach_arr_destroy(goldbach_arr_t* arr) {
     // for all elements in the array
