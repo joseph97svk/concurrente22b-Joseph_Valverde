@@ -1,33 +1,46 @@
 struct goldbach_element 
+
     the number
     amount of sums found
     2D array of the sums
 
+
 struct goldbach_arr
+
     amount of space available
     amount of contents
     sums between all elements in arr
     the elements with their numbers
 
+
 goldbach_arr_create()
+
     allocate space
     initialize all fields
     return goldbach_arr
 
+
 goldbach_element_init()
+
     initialize all fields
 
+
 delete_goldbach_element()
+
     free all allocated space
 
+
 goldbach_add_num()
+
     if count equals capacity
         allocate more space in goldbach_arr to add element
     initialize new element in goldbach_arr 
     set the number in the element
     increase the count in the array
 
+
 goldbach_add_sum()
+
     get the position for the operations
     increase sum amount
     increase the amount of space for sums in the given element
@@ -44,20 +57,27 @@ goldbach_add_sum()
     
 
 goldbach_get_arr_count()
+
     return the count from the goldbach_arr
     
 
 goldbach_get_current_number()
+
     return the number at the given position of goldbach_arr
    
 
 goldbach_get_sums_amount()
+
     return amount of sums for a given number at the given position of goldbach_arr
 
+
 goldbach_arr_get_total_sums_amount()
+
     return the total amount of sums from the goldbach_arr
 
+
 goldbach_get_sum()
+
     provide the length of the sum
     allocate space for sum to be returned
     copy from the sum in the element at the given position of the goldbach_arr 
@@ -65,7 +85,9 @@ goldbach_get_sum()
 
     return the sum
 
+
 goldbach_arr_destroy()
+
     for all elements in the goldbach_arr
         for all sums in the given element
             free each sum

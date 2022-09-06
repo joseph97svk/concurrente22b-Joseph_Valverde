@@ -1,4 +1,5 @@
 goldbach_read_numbers()
+
     while there is an input
        if it is next line
             return
@@ -10,7 +11,9 @@ goldbach_read_numbers()
             return invalid input error
         clean the input variable for next input
 
+
 validity_check()
+
     if the first char is not a number
         if the first char is not num, and also not a minus
             return false
@@ -30,11 +33,15 @@ validity_check()
 
     return true
 
+
 goldbach_process_sums()
+
     for all numbers in goldbach_arr
         goldbach_process_num()
 
+
 goldbach_process_num()
+
     if less than 0
         make it positive
     
@@ -46,13 +53,17 @@ goldbach_process_num()
     else   
         goldbach_odd_process()
     
+
 goldbach_even_process()
+
     for all find_next_prime() begining in 2, until the number/2
         other_number := number - current_number 
         if is_prime_num(other_number)
             add it to goldbach_arr
 
+
 goldbach_odd_process()
+
     for all find_next_prime() begining in 2, until the number/2 {
         var current_number
         for all find_next_prime() in 2, until the (number - current number)/2 {
@@ -63,7 +74,9 @@ goldbach_odd_process()
         }
     }
 
+
 find_next_prime()
+
     if number is even
         number += 1
     else 
@@ -74,7 +87,9 @@ find_next_prime()
 
     return number
 
+
 is_prime_num()
+
     var comaprator := 5
 
     if number is two or three
@@ -89,7 +104,9 @@ is_prime_num()
     
     return if comparator^2 is greater than number
 
+
 goldbach_print_sums()
+
     print totals 
     
     for each number in a goldbach_arr

@@ -22,16 +22,14 @@ The goldbach_arr contains a array of goldbach_element(s). The goldbach_arr will 
 
 === main ===
 
-[section, c]
-
+include::main.pseudo[]
 
 
 === golbach_conjecture ===
 
-[section, c]
-
+include::goldbach_conjecture.pseudo[]
 
 
 === goldbach_arr ===
 
-[section, c]
+include::goldbach_arr.pseudo[]
