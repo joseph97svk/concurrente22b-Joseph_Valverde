@@ -74,7 +74,8 @@ int64_t goldbach_get_arr_count(goldbach_arr_t* arr);
  * @param position where the number is going to be fetched
  * @return int64_t 
  */
-int64_t goldbach_get_current_number(goldbach_arr_t* arr, const int64_t position);
+int64_t goldbach_get_current_number(goldbach_arr_t* arr,
+const int64_t position);
 
 /**
  * @brief returns the amount of sums located in a given position of arr

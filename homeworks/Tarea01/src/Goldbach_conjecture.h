@@ -6,7 +6,8 @@
  * 
  */
 enum goldbach_conjecture_error {
-    error_invalid_input_given = 150
+    error_invalid_input_given = 150,
+    error_sum_memory_allocation_failure,
 };
 
 /**
