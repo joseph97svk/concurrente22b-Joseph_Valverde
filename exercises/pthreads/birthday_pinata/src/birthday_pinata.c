@@ -31,9 +31,9 @@ typedef struct private_data {
 } private_data_t;
 
 
-int birthday_party (shared_data_t* shared_data);
+int birthday_party(shared_data_t* shared_data);
 
-void* hit_pinata (void* data);
+void* hit_pinata(void* data);
 
 int main(int argc, char* argv[]) {
     int error = EXIT_SUCCESS_ERROR;
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
     return error;
 }
 
-int birthday_party (shared_data_t* shared_data) {
+int birthday_party(shared_data_t* shared_data) {
 
     int error = EXIT_SUCCESS;
 
@@ -131,7 +131,7 @@ int birthday_party (shared_data_t* shared_data) {
 }
 
 void* hit_pinata (void* data) {
-    private_data_t* private_data = (private_data_t*) data;
+    private_data_t* private_data =(private_data_t*) data;
     shared_data_t* shared_data = private_data -> shared_data;
 
     uint32_t hit_counter = 0;
@@ -150,7 +150,7 @@ void* hit_pinata (void* data) {
         } pthread_mutex_unlock(&(shared_data -> permision_to_strike));
 
         // it takes time to swing again after having swung before
-        usleep(50); 
+        // usleep(50);
     }
 
     if (!pinata_is_alive && destroyed_pinata) {

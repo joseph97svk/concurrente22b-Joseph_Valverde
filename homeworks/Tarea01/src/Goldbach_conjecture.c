@@ -170,7 +170,7 @@ const int64_t number, const int64_t position) {
   }
 
   // if less than 6, then nothing to be done
-  if (current_num < 6) {
+  if (current_num < 6 && current_num != 4) {
     return num_process_error;
   }
 
