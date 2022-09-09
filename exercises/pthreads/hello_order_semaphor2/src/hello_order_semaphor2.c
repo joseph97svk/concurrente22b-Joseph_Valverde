@@ -28,6 +28,8 @@ typedef struct private_data {
 void* greet(void* data);
 int create_threads(shared_data_t* shared_data);
 
+#define POSITION 2
+
 // procedure main(argc, argv[])
 int main(int argc, char* argv[]) {
   int error = EXIT_SUCCESS;
@@ -53,11 +55,24 @@ int main(int argc, char* argv[]) {
     for (uint64_t thread_number = 0; thread_number < shared_data->thread_count
         ; ++thread_number) {
       // can_greet[thread_number] := create_semaphore(not thread_number)
-      error = sem_init(&shared_data -> can_greet[thread_number], /*pshared*/ 0
+
+      #if POSITION == 0
+      error = sem_init(&shared_data->can_greet[thread_number], /*pshared*/ 0
         , /*value*/ !thread_number);
+      #endif
+
+      #if POSITION != 0
+      error = sem_init(&shared_data->can_greet[thread_number], /*pshared*/ 0
+        , /*value*/ 0);
+      #endif
     }
 
     if (shared_data->can_greet) {
+      
+      #if POSITION == 1
+      error = sem_post(&shared_data -> can_greet[0]);
+      #endif
+
       // time related
       struct timespec start_time, finish_time;
       clock_gettime(CLOCK_MONOTONIC, &start_time);
@@ -98,9 +113,9 @@ int create_threads(shared_data_t* shared_data) {
   // create threads if memory could be allocated
   if (threads && private_data) {
 
-    for (uint64_t thread_number = 0; thread_number < shared_data->thread_count
+    for (uint64_t thread_number = 0; thread_number < shared_data -> thread_count
         ; ++thread_number) {
-          
+
       if (error == EXIT_SUCCESS) {
         //assign private data
         private_data[thread_number].thread_number = thread_number;
@@ -125,6 +140,10 @@ int create_threads(shared_data_t* shared_data) {
 
     // print "Hello from main thread"
     printf("Hello from main thread\n");
+
+    #if POSITION == 2
+      error = sem_post(&shared_data -> can_greet[0]);
+    #endif
 
     // join threads
     for (uint64_t thread_number = 0; thread_number < shared_data->thread_count
