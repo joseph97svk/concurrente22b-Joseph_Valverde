@@ -40,7 +40,7 @@ const int64_t number, const int64_t position);
  * @return int32_t 
  */
 int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr,
-const int64_t num, const int64_t position);
+const int64_t num, const int64_t position, bool positive);
 
 /**
  * @brief processes an even number according to the goldbach conjecture
@@ -51,7 +51,7 @@ const int64_t num, const int64_t position);
  * @return int32_t 
  */
 int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr,
-const int64_t num, const int64_t position);
+const int64_t num, const int64_t position, bool positive);
 
 /**
  * @brief Finds the next prime number after the given number
@@ -164,23 +164,26 @@ int32_t goldbach_process_num(goldbach_arr_t* goldbach_arr,
 const int64_t number, const int64_t position) {
   int64_t current_num = number;
   int32_t num_process_error = EXIT_SUCCESS;
+  bool positive = true;
+
   // if the number is negative, then make it positive
   if (current_num < 0) {
     current_num = -current_num;
+    positive = false;
   }
 
   // if less than 6, then nothing to be done
-  if (current_num < 6 && current_num != 4) {
+  if (current_num < 6) {
     return num_process_error;
   }
 
   // process according to if the number is even or odd
   if (current_num % 2 == 0) {
     num_process_error = goldbach_even_process(goldbach_arr,
-    current_num, position);
+    current_num, position, positive);
   } else {
     num_process_error = goldbach_odd_process(goldbach_arr,
-    current_num, position);
+    current_num, position, positive);
   }
 
   return num_process_error;
@@ -195,7 +198,7 @@ const int64_t number, const int64_t position) {
  * @return int32_t 
  */
 int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr,
-const int64_t number, const int64_t position) {
+const int64_t number, const int64_t position, bool positive) {
   const int32_t size = 3;
   int64_t third_number = 0;
   int32_t num_process_error = EXIT_SUCCESS;
@@ -225,16 +228,21 @@ const int64_t number, const int64_t position) {
       third_number >= current_second_number &&
       current_second_number >= current_number) {
         // if so then add to the goldbach_arr
-        current_sum[0] = current_number;
-        current_sum[1] = current_second_number;
-        current_sum[2] = third_number;
+        if (!positive) {
+          current_sum[0] = current_number;
+          current_sum[1] = current_second_number;
+          current_sum[2] = third_number;
 
-        num_process_error = goldbach_add_sum(goldbach_arr,
-        current_sum, position);
+          num_process_error = goldbach_add_sum(goldbach_arr,
+          current_sum, position);
+        } else {
+          goldbach_add_ghost_sum(goldbach_arr, position);
+        }
       }
     }
   }
 
+  goldbach_finish_num_sums(goldbach_arr, position);
   // free allocated space
   free(current_sum);
 
@@ -250,7 +258,7 @@ const int64_t number, const int64_t position) {
  * @return int32_t 
  */
 int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr,
-const int64_t number, const int64_t position) {
+const int64_t number, const int64_t position, bool positive) {
   int32_t num_process_error = EXIT_SUCCESS;
 
   const int32_t size = 2;
@@ -268,13 +276,19 @@ const int64_t number, const int64_t position) {
     // if both numbers are prime
     if (isPrimeNum(other_number)) {
       // add to goldbach_arr
-      current_sum[0] = current_number;
-      current_sum[1] = other_number;
+      if (!positive) {
+        current_sum[0] = current_number;
+        current_sum[1] = other_number;
 
-      num_process_error =
-      goldbach_add_sum(goldbach_arr, current_sum, position);
+        num_process_error =
+        goldbach_add_sum(goldbach_arr, current_sum, position);
+      } else {
+        goldbach_add_ghost_sum(goldbach_arr, position);
+      }
     }
   }
+
+  goldbach_finish_num_sums(goldbach_arr, position);
 
   // free allocated memory space
   free(current_sum);

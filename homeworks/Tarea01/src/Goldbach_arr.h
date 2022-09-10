@@ -61,6 +61,24 @@ int32_t goldbach_add_sum(goldbach_arr_t* arr,
 const int64_t* const sum, const int64_t position);
 
 /**
+ * @brief increases a number sum count without adding sums
+ * 
+ * @param arr where the number is located
+ * @param position location of the number
+ * @return int32_t 
+ */
+void goldbach_add_ghost_sum(goldbach_arr_t* arr, const int64_t position);
+
+/**
+ * @brief removes extra capacity allocated for numbers
+ * 
+ * @param arr location of the sum
+ * @param position postion of the number
+ * @return int32_t 
+ */
+int32_t goldbach_finish_num_sums(goldbach_arr_t* arr, const int64_t position);
+
+/**
  * @brief returns the count of elements or numbers in arr
  * @param arr goldbach array of numbers and processed sums
  * @return int64_t 

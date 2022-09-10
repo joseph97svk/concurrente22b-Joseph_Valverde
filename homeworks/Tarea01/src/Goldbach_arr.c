@@ -81,12 +81,8 @@ int32_t goldbach_element_init(goldbach_element_t* element) {
   // initialize values
   element -> number = 0;
   element -> sum_amount = 0;
-  element -> sums = malloc(1);  // get an address
+  element -> sums = NULL;  // get an address
 
-  if (element -> sums == NULL) {
-    fprintf(stderr, "Error: memory could not be allocated");
-    return error_element_memory_allocation_failure;
-  }
   return EXIT_SUCCESS;
 }
 
@@ -170,22 +166,26 @@ const int64_t* const sum, const int64_t position) {
   // get the position for the operations
   int64_t sum_position = arr -> elements[position].sum_amount;
 
+  // increase the amount of space in the array of pointers
+  if (arr -> elements[position].sum_amount != 0 &&
+  arr -> elements[position].sum_amount % 10 == 0) {
+
+    int64_t** sums_buffer = realloc(arr -> elements[position].sums,
+    ((arr -> elements[position].sum_amount) + 10) * sizeof(int64_t**));
+
+    // if memory for sums could not be allocted, report failure
+    if (sums_buffer == NULL) {
+      return error_adding_sum_current_sum_memory_allocation_failure;
+    }
+
+    // assign new address if succesful
+    arr -> elements[position].sums = sums_buffer;
+  }
+
   // increase sum amount
   arr -> elements[position].sum_amount =
   (arr -> elements[position].sum_amount) + 1;
-
-  // increase the amount of space in the array of pointers
-  int64_t** sums_buffer = realloc(arr -> elements[position].sums,
-  (arr -> elements[position].sum_amount) * sizeof(int64_t**));
-
-  // if memory for sums could not be allocted, report failure
-  if (sums_buffer == NULL) {
-    return error_adding_sum_current_sum_memory_allocation_failure;
-  }
-
-  // assign new address if succesful
-  arr -> elements[position].sums = sums_buffer;
-
+  
   // buffer the sum amount
   int64_t sum_element_amount = 3;
 
@@ -220,6 +220,40 @@ const int64_t* const sum, const int64_t position) {
   }
 
   (arr -> total_sums_amount) += 1;
+  return EXIT_SUCCESS;
+}
+
+/**
+ * @brief increases a number sum count without adding sums
+ * 
+ * @param arr where the number is located
+ * @param position location of the number
+ * @return int32_t 
+ */
+void goldbach_add_ghost_sum(goldbach_arr_t* arr, const int64_t position) {
+  (arr -> elements[position].sum_amount) += 1; 
+  (arr -> total_sums_amount) += 1;
+}
+
+/**
+ * @brief removes extra capacity allocated for numbers
+ * 
+ * @param arr location of the sum
+ * @return int32_t 
+ */
+int32_t goldbach_finish_num_sums(goldbach_arr_t* arr, const int64_t position) {
+  if (arr -> elements[position].number > 0) {
+    return EXIT_SUCCESS;
+  }
+
+  int64_t** buffer = realloc(arr -> elements[position].sums,
+  sizeof(int64_t**) * arr -> elements[position].sum_amount);
+  
+  if (buffer == NULL) {
+    return error_adding_sum_sums_memory_allocation_failure;
+  }
+
+  arr -> elements[position].sums = buffer;
   return EXIT_SUCCESS;
 }
 
@@ -319,8 +353,11 @@ const int64_t num_position, const int64_t sum_position) {
 
   // copy the sum to the allocated array to be returned
   for (int64_t sum_num = 0; sum_num < *size; sum_num++) {
-    sum[sum_num] =
-    arr -> elements[num_position].sums[sum_position][sum_num];
+    if (sum != NULL || 
+    arr -> elements[num_position].sums != NULL) {
+      sum[sum_num] =
+      arr -> elements[num_position].sums[sum_position][sum_num];
+    }
   }
 
   return sum;
@@ -335,17 +372,19 @@ void goldbach_arr_destroy(goldbach_arr_t* arr) {
   // for all elements in the array
   for (int64_t element = 0; element < arr -> count; element++) {
     // for all sums in the a given element
-    for (int64_t sum = 0;
-    sum < arr -> elements[element].sum_amount; sum++) {
-      // free if previously correctly allocated
-      if (arr -> elements[element].sums[sum] != NULL) {
-        free(arr -> elements[element].sums[sum]);
+    if (arr -> elements[element].number < 0) {
+      for (int64_t sum = 0;
+      sum < arr -> elements[element].sum_amount; sum++) {
+        // free if previously correctly allocated
+        if (arr -> elements[element].sums[sum] != NULL) {
+          free(arr -> elements[element].sums[sum]);
+        }
       }
-    }
 
-    // free the sums array
-    if (arr -> elements[element].sums != NULL) {
-      free(arr -> elements[element].sums);
+      // free the sums array
+      if (arr -> elements[element].sums != NULL) {
+        free(arr -> elements[element].sums);
+      }
     }
   }
 
