@@ -31,7 +31,8 @@ int main(int argc, char* argv[]) {
     int64_t teamA_score = 0, teamB_score = 0;
 
     if (teamA == NULL || teamB == NULL) {
-        fscanf(stderr, "Error: one or both teams are missing from the field!\nThe scoreboad might have also gotten stolen!");
+        fscanf(stderr,
+        "Error: one or both teams are missing from the field!\nThe scoreboad might have also gotten stolen!");
 
         // free arrays
         free(teamA);
@@ -63,18 +64,22 @@ int main(int argc, char* argv[]) {
         // send player for team 1
         player_ids[teammate][0] = 1;
         player_ids[teammate][1] = teammate + 1;
-        int32_t player_shoot_errorA = pthread_create(&teamA[teammate], NULL, player_shoot, (void*) player_ids[teammate]);
+        int32_t player_shoot_errorA = pthread_create(&teamA[teammate], NULL,
+        player_shoot, (void*) player_ids[teammate]);
         
         // send player for team 2
         player_ids[teammate + player_amount][0] = 2;
         player_ids[teammate + player_amount][1] = teammate + 1;
-        int32_t player_shoot_errorB = pthread_create(&teamB[teammate], NULL, player_shoot, (void*) player_ids[teammate + player_amount]);
+        int32_t player_shoot_errorB = pthread_create(&teamB[teammate], NULL,
+        player_shoot, (void*) player_ids[teammate + player_amount]);
 
-        if (player_shoot_errorA == EXIT_FAILURE || player_shoot_errorB == EXIT_FAILURE) {
+        if (player_shoot_errorA == EXIT_FAILURE ||
+        player_shoot_errorB == EXIT_FAILURE) {
             free (player_ids);
             free(teamA);
             free(teamB);
-            fscanf(stderr, "Error: Teammate injured! The game was suspended");
+            fscanf(stderr,
+            "Error: Teammate injured! The game was suspended");
             return EXIT_FAILURE;
         }
     }
@@ -102,7 +107,8 @@ int main(int argc, char* argv[]) {
     if (teamA_score > teamB_score) {
         winner = 1;
     } 
-    printf("result: %li:%li, team %i wins\n", teamA_score, teamB_score, winner);
+    printf("result: %li:%li, team %i wins\n",
+    teamA_score, teamB_score, winner);
    
     
     // report the results
@@ -146,8 +152,9 @@ void* player_shoot (void* data) {
         }
     }
 
-    printf("%li.%li: best shot put %fm\n", id_info[0], id_info[1], number_generated);
+    printf("%li.%li: best shot put %fm\n", id_info[0],
+    id_info[1], number_generated);
 
     // return the results
-    return (void*)*(size_t*)&number_generated;
+    return (void*)(size_t)number_generated;
 }

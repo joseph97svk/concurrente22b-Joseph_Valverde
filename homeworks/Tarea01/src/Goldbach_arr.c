@@ -28,23 +28,18 @@ struct goldbach_arr {
 };
 
 /**
- * @brief Initializes a goldbach_element
+ * Initializes a goldbach_element
  * 
- * @param element the element to be initialized
- * @return int32_t 
  */
 int32_t goldbach_element_init(goldbach_element_t* element);
 
 /**
- * @brief Deletes the goldbach element 
- * @details frees allocated memory for the given element
- * @param element element to be deleted
+ * Deletes the goldbach element 
  */
 void delete_goldbach_element(goldbach_element_t* element);
 
 /**
- * @brief 
- * @see golbach_arr_create()
+ * Creates and initializes goldbach_arr
  */
 goldbach_arr_t* goldbach_arr_create() {
   // allocate
@@ -72,10 +67,8 @@ goldbach_arr_t* goldbach_arr_create() {
 }
 
 /**
- * @brief Initializes a goldbach_element
+ * Initializes a goldbach_element
  * 
- * @param element the element to be initialized
- * @return int32_t 
  */
 int32_t goldbach_element_init(goldbach_element_t* element) {
   // initialize values
@@ -88,20 +81,15 @@ int32_t goldbach_element_init(goldbach_element_t* element) {
 
 
 /**
- * @brief Deletes the goldbach element 
- * @details frees allocated memory for the given element
- * @param element element to be deleted
+ * Deletes the goldbach element 
  */
 void delete_goldbach_element(goldbach_element_t* element) {
   free(element -> sums);
 }
 
 /**
- * @brief Adds a number to dynamic array goldbach_arr
+ * Adds a number to dynamic array goldbach_arr
  * 
- * @param arr where the number will be stored
- * @param num that will be stored in goldbach_arr
- * @return int32_t success-error state
  */
 int32_t goldbach_add_num(goldbach_arr_t* arr, const int64_t num) {
   // check if the memory had already been allocated
@@ -136,15 +124,10 @@ int32_t goldbach_add_num(goldbach_arr_t* arr, const int64_t num) {
 }
 
 /**
- * @brief Adds an array of the numbers of an addition
- * @details Copies numbers from given array into arr,
+ * Adds an array of the numbers of an addition
+ * Copies numbers from given array into arr,
  * no need to dinamically allocate and given arr can be discarded
  * Copies amount of numbers according to number in position of arr
- * @param arr where the sum will be stored
- * @param sum array of sum to be copied into arr
- * @param position within arr of where the sum will be stored
- * note: Invalid positions will return error and nothing will be copied
- * @return int32_t success-error state
  */
 int32_t goldbach_add_sum(goldbach_arr_t* arr,
 const int64_t* const sum, const int64_t position) {
@@ -152,7 +135,7 @@ const int64_t* const sum, const int64_t position) {
   if (position >= arr -> count|| sum == NULL) {
     return error_adding_sum_failure_invalid_position_or_given_sum;
   }
-  
+
   // check if memory had previously been allocated
   if (arr -> elements[position].sums == NULL) {
     arr -> elements[position].sums = malloc(sizeof(int64_t**) * 10);
@@ -169,7 +152,6 @@ const int64_t* const sum, const int64_t position) {
   // increase the amount of space in the array of pointers
   if (arr -> elements[position].sum_amount != 0 &&
   arr -> elements[position].sum_amount % 10 == 0) {
-
     int64_t** sums_buffer = realloc(arr -> elements[position].sums,
     ((arr -> elements[position].sum_amount) + 10) * sizeof(int64_t**));
 
@@ -185,7 +167,7 @@ const int64_t* const sum, const int64_t position) {
   // increase sum amount
   arr -> elements[position].sum_amount =
   (arr -> elements[position].sum_amount) + 1;
-  
+
   // buffer the sum amount
   int64_t sum_element_amount = 3;
 
@@ -224,22 +206,17 @@ const int64_t* const sum, const int64_t position) {
 }
 
 /**
- * @brief increases a number sum count without adding sums
+ * increases a number sum count without adding sums
  * 
- * @param arr where the number is located
- * @param position location of the number
- * @return int32_t 
  */
 void goldbach_add_ghost_sum(goldbach_arr_t* arr, const int64_t position) {
-  (arr -> elements[position].sum_amount) += 1; 
+  (arr -> elements[position].sum_amount) += 1;
   (arr -> total_sums_amount) += 1;
 }
 
 /**
- * @brief removes extra capacity allocated for numbers
+ * removes extra capacity allocated for numbers
  * 
- * @param arr location of the sum
- * @return int32_t 
  */
 int32_t goldbach_finish_num_sums(goldbach_arr_t* arr, const int64_t position) {
   if (arr -> elements[position].number > 0) {
@@ -248,7 +225,7 @@ int32_t goldbach_finish_num_sums(goldbach_arr_t* arr, const int64_t position) {
 
   int64_t** buffer = realloc(arr -> elements[position].sums,
   sizeof(int64_t**) * arr -> elements[position].sum_amount);
-  
+
   if (buffer == NULL) {
     return error_adding_sum_sums_memory_allocation_failure;
   }
@@ -258,10 +235,7 @@ int32_t goldbach_finish_num_sums(goldbach_arr_t* arr, const int64_t position) {
 }
 
 /**
- * @brief returns the count of elements or numbers in arr
- * @details invalid array will return -1
- * @param arr goldbach array of numbers and processed sums
- * @return int64_t 
+ * returns the count of elements or numbers in arr
  */
 int64_t goldbach_get_arr_count(goldbach_arr_t* arr) {
   if (arr == NULL) {
@@ -272,11 +246,8 @@ int64_t goldbach_get_arr_count(goldbach_arr_t* arr) {
 }
 
 /**
- * @brief returns the number at a given position
- * @details invalid position will return 0
- * @param arr array from where number is going to be fetched
- * @param position where the number is going to be fetched
- * @return int64_t 
+ * Returns the number at a given position
+ * invalid position will return 0
  */
 int64_t goldbach_get_current_number(goldbach_arr_t* arr,
 const int64_t position) {
@@ -287,11 +258,7 @@ const int64_t position) {
 }
 
 /**
- * @brief returns the amount of sums located in a given position of arr
- * @details invalid position will return -1
- * @param arr @see goldbach_array()
- * @param position of number whose sums amount is to be fetched
- * @return int64_t 
+ * returns the amount of sums located in a given position of arr
  */
 int64_t goldbach_get_sums_amount(goldbach_arr_t* arr, const int64_t position) {
   if (position < 0 || position > arr -> count) {
@@ -302,25 +269,18 @@ int64_t goldbach_get_sums_amount(goldbach_arr_t* arr, const int64_t position) {
 }
 
 /**
- * @brief returns the total amount of sums stored among all the numbers in the array
+ * returns the total amount of sums stored among all the numbers in the array
  * 
- * @param arr @see goldbach_array()
- * @return int64_t 
  */
 int64_t goldbach_arr_get_total_sums_amount(goldbach_arr_t* arr) {
     return arr -> total_sums_amount;
 }
 
 /**
- * @brief Returns an array with the numbers of the sum
- * @details sum must be dealocated afterwards to prevent memory leak
+ * Returns an array with the numbers of the sum
+ * sum must be dealocated afterwards to prevent memory leak
  * invalid positions return null pointer
  * failure to allocate array for sum will return null pointer
- * @param arr the goldbach_arr from which the sum is fetched
- * @param size pointer to which the size of the returned sum will be stored
- * @param num_position position of the number
- * @param sum_position position from among the sums for the given number
- * @return int* 
  */
 int64_t* goldbach_get_sum(const goldbach_arr_t* const arr, int64_t* size,
 const int64_t num_position, const int64_t sum_position) {
@@ -353,7 +313,7 @@ const int64_t num_position, const int64_t sum_position) {
 
   // copy the sum to the allocated array to be returned
   for (int64_t sum_num = 0; sum_num < *size; sum_num++) {
-    if (sum != NULL || 
+    if (sum != NULL ||
     arr -> elements[num_position].sums != NULL) {
       sum[sum_num] =
       arr -> elements[num_position].sums[sum_position][sum_num];
@@ -364,9 +324,8 @@ const int64_t num_position, const int64_t sum_position) {
 }
 
 /**
- * @brief deallocates all memory allocated for goldbach_arr
+ * deallocates all memory allocated for goldbach_arr
  * 
- * @param arr @see goldbach_arr()
  */
 void goldbach_arr_destroy(goldbach_arr_t* arr) {
   // for all elements in the array

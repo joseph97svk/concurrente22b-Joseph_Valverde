@@ -11,68 +11,47 @@
 #include "Goldbach_conjecture.h"
 
 /**
- * @brief checks if the given input is valid and gives the value
+ * checks if the given input is valid and gives the value
  * 
- * @param string to be checked
- * @param value where the value will be stored
- * @return true if value is valid
- * @return false if value is invalid
  */
 bool num_validity_check(char string[64], int64_t* value);
 
 /**
- * @brief Processess a given number according to the goldbach conjecture
+ * Processess a given number according to the goldbach conjecture
  * 
- * @param goldbach_arr where the results will be stored
- * @param number number to be processed
- * @param position position within the goldbach_arr of the number
- * @return int32_t 
  */
 int32_t goldbach_process_num(goldbach_arr_t* goldbach_arr,
 const int64_t number, const int64_t position);
 
 /**
- * @brief processes an odd number according to the goldbach conjecture
+ * processes an odd number according to the goldbach conjecture
  * 
- * @param goldbach_arr @see goldbach_process_num
- * @param num @see goldbach_process_num
- * @param position @see goldbach_process_num
- * @return int32_t 
  */
 int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr,
 const int64_t num, const int64_t position, bool positive);
 
 /**
- * @brief processes an even number according to the goldbach conjecture
+ * processes an even number according to the goldbach conjecture
  * 
- * @param goldbach_arr @see goldbach_process_num()
- * @param num @see goldbach_process_num()
- * @param position @see goldbach_process_num()
- * @return int32_t 
  */
 int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr,
 const int64_t num, const int64_t position, bool positive);
 
 /**
- * @brief Finds the next prime number after the given number
- * @details last_prime may or may not be prime,
+ * Finds the next prime number after the given number
+ * last_prime may or may not be prime,
  * will still, regardless, find the next prime number
  * 
- * @param last_prime number after which the next prime number is to be found
- * @return int64_t 
  */
 int64_t find_next_prime(const int64_t last_prime);
 
 /**
- * @brief checks if a given number is prime
- * @details based on the primality test algorithm in
+ * checks if a given number is prime
+ * based on the primality test algorithm in
  * https://en.wikipedia.org/wiki/Primality_test
  * 
  * Based on the principle where all prime numbers greater than 3
  * can be representad as 6k + 1
- * @param number the number to be checked
- * @return true if the number is prime
- * @return false if the number is not prime
  */
 bool isPrimeNum(const int64_t number);
 
@@ -124,12 +103,9 @@ int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr) {
 }
 
 /**
- * @brief Processes and solves the numbers according to the 
+ * Processes and solves the numbers according to the 
  * Golbach conjecture
  * 
- * @param goldbach_arr pointer to goldbach_arr where numbers 
- * to be processed are store and where solutions will be stored
- * @return int32_t error-success state
  */
 int32_t goldbach_process_sums(goldbach_arr_t* goldbach_arr) {
   int64_t size = goldbach_get_arr_count(goldbach_arr);
@@ -153,12 +129,8 @@ int32_t goldbach_process_sums(goldbach_arr_t* goldbach_arr) {
 }
 
 /**
- * @brief Processess a given number according to the goldbach conjecture
- * 
- * @param goldbach_arr where the results will be stored
- * @param number number to be processed
- * @param position position within the goldbach_arr of the number
- * @return int32_t 
+ * Processess a given number according to the goldbach conjecture
+ *  
  */
 int32_t goldbach_process_num(goldbach_arr_t* goldbach_arr,
 const int64_t number, const int64_t position) {
@@ -173,7 +145,7 @@ const int64_t number, const int64_t position) {
   }
 
   // if less than 6, then nothing to be done
-  if (current_num < 6) {
+  if (current_num < 6 && current_num != 4) {
     return num_process_error;
   }
 
@@ -190,12 +162,8 @@ const int64_t number, const int64_t position) {
 }
 
 /**
- * @brief processes an odd number according to the goldbach conjecture
+ * processes an odd number according to the goldbach conjecture
  * 
- * @param goldbach_arr @see goldbach_process_num
- * @param number @see goldbach_process_num
- * @param position @see goldbach_process_num
- * @return int32_t 
  */
 int32_t goldbach_odd_process(goldbach_arr_t* goldbach_arr,
 const int64_t number, const int64_t position, bool positive) {
@@ -250,12 +218,8 @@ const int64_t number, const int64_t position, bool positive) {
 }
 
 /**
- * @brief processes an even number according to the goldbach conjecture
+ * processes an even number according to the goldbach conjecture
  * 
- * @param goldbach_arr @see goldbach_process_num()
- * @param number @see goldbach_process_num()
- * @param position @see goldbach_process_num()
- * @return int32_t 
  */
 int32_t goldbach_even_process(goldbach_arr_t* goldbach_arr,
 const int64_t number, const int64_t position, bool positive) {
@@ -297,12 +261,7 @@ const int64_t number, const int64_t position, bool positive) {
 }
 
 /**
- * @brief Finds the next prime number after the given number
- * @details last_prime may or may not be prime,
- * will still, regardless, find the next prime number
- * 
- * @param last_prime number after which the next prime number is to be found
- * @return int64_t 
+ * Finds the next prime number after the given number
  */
 int64_t find_next_prime(const int64_t last_prime) {
   // if even start at next number
@@ -322,15 +281,12 @@ int64_t find_next_prime(const int64_t last_prime) {
 }
 
 /**
- * @brief checks if a given number is prime
- * @details based on the primality test algorithm in
+ * checks if a given number is prime
+ * based on the primality test algorithm in
  * https://en.wikipedia.org/wiki/Primality_test
  * 
  * Based on the principle where all prime numbers greater than 3
  * can be representad as 6k + 1
- * @param number the number to be checked
- * @return true if the number is prime
- * @return false if the number is not prime
  */
 bool isPrimeNum(const int64_t number) {
   int64_t comparator = 5;
@@ -358,17 +314,14 @@ bool isPrimeNum(const int64_t number) {
 }
 
 /**
- * @brief Prints the results after processing the solutions
- * @details DO NOT print before solving, undefined behaviour
- * 
- * @param goldbach_arr goldbach_arr from where sums are extracted
+ * Prints the results after processing the solutions
  */
 void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
   int64_t size = 0, sum_amount = 0;
   int64_t* current_sum;
 
   // print totals
-  printf("Total: %" PRId64 " numbers %" PRId64 " sums\n\n",
+  printf("Total %" PRId64 " numbers %" PRId64 " sums\n\n",
   goldbach_get_arr_count(goldbach_arr),
   goldbach_arr_get_total_sums_amount(goldbach_arr));
 
@@ -421,20 +374,19 @@ void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
 }
 
 /**
- * @brief checks if the given input is valid and gives the value
+ * checks if the given input is valid and gives the value
  * 
- * @param string to be checked
- * @param value where the value will be stored
- * @return true if value is valid
- * @return false if value is invalid
  */
 bool num_validity_check(char string[64], int64_t* value) {
   errno = 0;
 
   char* end_ptr;
 
+  bool num_found = string[0] > 47 && string[0] < 58;
+  int32_t minus_found = 0;
+
   // if the first char is not a number
-  if (string[0] < 48 || string[0] > 57) {
+  if (!num_found && string[0] != 32) {
     // if the first char is not num, and also not a minus
     if (string[0] != '-') {
       return false;
@@ -442,12 +394,32 @@ bool num_validity_check(char string[64], int64_t* value) {
     } else if (strlen(string) == 1) {
       return false;
     }
+    minus_found++;
   }
 
   // begin checking at second char if it is num (first already checked)
   for (size_t character = 1; character < strlen(string) - 1; character++) {
+    if (minus_found > 1) {
+      return false;
+    }
+
+    if (!num_found) {
+      if (string[character] == '-') {
+          minus_found++;
+        if (string[character - 1] == '-') {
+          return false;
+        }
+        continue;
+      } else if (string[character] == 32 &&
+      minus_found > 0) {
+        return false;
+      }
+    }
+
+    num_found = string[character] > 47 && string[character] < 58;
+
     // if subsequent chars are not nums
-    if (string[character] < 48 || string[character] > 57) {
+    if (!num_found && string[character] != 32) {
       // then invalid
       return false;
     }
