@@ -9,10 +9,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 // thread_shared_data_t
 typedef struct shared_data {
-  sem_t* can_greet;
+  char** sempahore_names;
+  sem_t** can_greet;
   uint64_t thread_count;
 } shared_data_t;
 
@@ -44,14 +46,30 @@ int main(int argc, char* argv[]) {
 
   shared_data_t* shared_data = (shared_data_t*)calloc(1, sizeof(shared_data_t));
   if (shared_data) {
-    shared_data->can_greet = (sem_t*) calloc(thread_count, sizeof(sem_t));
+    shared_data->can_greet = (sem_t**) calloc(thread_count, sizeof(sem_t*));
     shared_data->thread_count = thread_count;
+
+    shared_data -> sempahore_names = calloc (thread_count, sizeof(char*));
+
+    if (shared_data -> sempahore_names == NULL) {
+      return 10;
+    }
 
     for (uint64_t thread_number = 0; thread_number < shared_data->thread_count
         ; ++thread_number) {
+      
+      shared_data -> sempahore_names[thread_number] = calloc (7, sizeof(char));
+      shared_data -> sempahore_names[thread_number][0] = '/';
+      sprintf(shared_data -> sempahore_names[thread_number], "%ld", thread_number);
+
       // can_greet[thread_number] := create_semaphore(not thread_number)
-      error = sem_init(&shared_data->can_greet[thread_number], /*pshared*/ 0
-        , /*value*/ !thread_number);
+      shared_data -> can_greet[thread_number] =
+      sem_open(shared_data -> sempahore_names[thread_number],
+      O_CREAT, 0644, !thread_number);
+      if (shared_data -> can_greet[thread_number] ==  SEM_FAILED) {
+        error = 31;
+        goto finish;
+      }
     }
 
     if (shared_data->can_greet) {
@@ -76,6 +94,9 @@ int main(int argc, char* argv[]) {
     fprintf(stderr, "Error: could not allocate shared data\n");
     error = 12;
   }
+  finish:
+  
+
   return error;
 }  // end procedure
 
@@ -116,9 +137,14 @@ int create_threads(shared_data_t* shared_data) {
     for (uint64_t thread_number = 0; thread_number < shared_data->thread_count
         ; ++thread_number) {
       pthread_join(threads[thread_number], /*value_ptr*/ NULL);
-      sem_destroy(&shared_data->can_greet[thread_number]);
-    }
+      sem_close(shared_data->can_greet[thread_number]);
+      sem_unlink(shared_data -> sempahore_names[thread_number]);
+      
+      free(shared_data -> sempahore_names[thread_number]);
+    } 
 
+    
+    free(shared_data -> sempahore_names);
     free(private_data);
     free(threads);
   } else {
@@ -138,7 +164,7 @@ void* greet(void* data) {
 
   // Wait until it is my turn
   // wait(can_greet[thread_number])
-  int error = sem_wait(&shared_data->can_greet[private_data->thread_number]);
+  int error = sem_wait(shared_data->can_greet[private_data->thread_number]);
   if (error) {
     fprintf(stderr, "error: could not wait for semaphore\n");
   }
@@ -152,7 +178,7 @@ void* greet(void* data) {
   const uint64_t next_thread = (private_data->thread_number + 1)
     % shared_data->thread_count;
 
-  error = sem_post(&shared_data->can_greet[next_thread]);
+  error = sem_post(shared_data->can_greet[next_thread]);
   if (error) {
     fprintf(stderr, "error: could not increment semaphore\n");
   }
