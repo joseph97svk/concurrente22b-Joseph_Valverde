@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
       shared_data -> can_greet[thread_number] =
       sem_open(shared_data -> sempahore_names[thread_number],
       O_CREAT, 0644, !thread_number);
-      if (shared_data -> can_greet[thread_number] ==  SEM_FAILED) {
+      if (shared_data -> can_greet[thread_number] == SEM_FAILED) {
         error = 31;
         goto finish;
       }
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
     error = 12;
   }
   finish:
-  
+
 
   return error;
 }  // end procedure
