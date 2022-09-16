@@ -1,3 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <semaphore.h>
+#include <pthread.h>
+
+
 enum {
   ERR_NOMEM_SHARED = EXIT_FAILURE + 1,
   ERR_NOMEM_BUFFER,
@@ -29,3 +36,5 @@ typedef struct {
   size_t thread_number;
   shared_data_t* shared_data;
 } private_data_t;
+
+useconds_t random_between(useconds_t min, useconds_t max);

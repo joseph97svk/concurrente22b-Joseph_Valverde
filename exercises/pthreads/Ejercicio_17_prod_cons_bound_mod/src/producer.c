@@ -1,4 +1,10 @@
-useconds_t random_between(useconds_t min, useconds_t max);
+#include <unistd.h>
+#include <sys/random.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "producer.h"
+#include "thread_data.h"
 
 void* produce(void* data) {
   // const private_data_t* private_data = (private_data_t*)data;
@@ -20,8 +26,4 @@ void* produce(void* data) {
   }
 
   return NULL;
-}
-
-useconds_t random_between(useconds_t min, useconds_t max) {
-  return min + (max > min ? (random() % (max - min)) : 0);
 }

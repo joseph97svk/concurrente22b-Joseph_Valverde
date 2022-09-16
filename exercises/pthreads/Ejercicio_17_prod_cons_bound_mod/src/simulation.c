@@ -1,3 +1,6 @@
+#include "simulation.h"
+#include "assert.h"
+
 int analyze_arguments(int argc, char* argv[], shared_data_t* shared_data) {
   int error = EXIT_SUCCESS;
   if (argc == 7) {
