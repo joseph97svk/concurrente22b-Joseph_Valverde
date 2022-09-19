@@ -27,7 +27,9 @@ simulation_t* simulation_create() {
     simulation->consumer_min_delay = 0;
     simulation->consumer_max_delay = 0;
     queue_init(&simulation->queue);
-    simulation->next_unit = 0;
+    // pthread_mutex_init(&simulation->can_access_next_unit, /* attr */ NULL);
+    sem_init(&simulation->can_consume, /* pshared */ 0, /* value */ 0);
+    pthread_mutex_init(&simulation->can_access_queue, /* attr */ NULL);
     simulation->consumed_count = 0;
   }
   return simulation;
@@ -35,6 +37,10 @@ simulation_t* simulation_create() {
 
 void simulation_destroy(simulation_t* simulation) {
   assert(simulation);
+  pthread_mutex_destroy(&simulation->can_access_queue);
+  sem_destroy(&simulation -> can_produce);
+  sem_destroy(&simulation->can_consume);
+  // pthread_mutex_destroy(&simulation->can_access_next_unit);
   queue_destroy(&simulation->queue);
   free(simulation);
 }
@@ -48,6 +54,9 @@ int simulation_run(simulation_t* simulation, int argc, char* argv[]) {
 
     struct timespec start_time;
     clock_gettime(/*clk_id*/CLOCK_MONOTONIC, &start_time);
+
+    // semaphore for the production
+    sem_init(&simulation -> can_produce, 0, simulation -> unit_count);
 
     error = create_consumers_producers(simulation);
 

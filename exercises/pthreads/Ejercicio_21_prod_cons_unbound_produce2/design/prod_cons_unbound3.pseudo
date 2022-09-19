@@ -32,7 +32,7 @@ procedure main(argc, argv[]):
   end if
 end procedure
 
-procedure produce1:
+procedure produce3:
   while true do
     declare my_unit := 0
     lock(can_access_next_unit)

@@ -33,7 +33,15 @@ typedef struct simulation {
   useconds_t consumer_max_delay;
 
   queue_t queue;
-  size_t next_unit;
+  // no mutex necessary to access queue, thread safe
+
+  // pthread_mutex_t can_access_next_unit;
+
+  // size_t next_unit;
+  sem_t can_produce;
+  sem_t can_consume;
+
+  pthread_mutex_t can_access_queue;
   size_t consumed_count;
 } simulation_t;
 

@@ -14,9 +14,10 @@ procedure main(argc, argv[]):
     shared next_unit := 0
     shared can_access_next_unit := create_mutex()
 
+    shared can_produce := create_semaphore(unit_count)
     shared can_consume := create_semaphore(0)
-
-    declare producers := create_threads(producer_count, produce1)
+    
+    declare producers := create_threads(producer_count, produce)
     declare consumers := create_threads(consumer_count, consume)
 
     join_threads(producers)
@@ -29,21 +30,17 @@ procedure main(argc, argv[]):
   end if
 end procedure
 
-procedure produce1:
+procedure produce2:
   while true do
-    declare my_unit := 0
-    lock(can_access_next_unit)
-      if next_unit < unit_count then
-        next_unit := next_unit + 1
-        my_unit := next_unit
-      else
-        unlock(can_access_next_unit)
-        break while
-      end if
-    unlock(can_access_next_unit)
-  
+    if (!try_wait(can_produce))
+      signal(can_consume)
+      break while
+    end if
+
     delay(random_between(producer_min_delay, producer_max_delay))
+
     lock(can_access_queue)
+      declare my_unit := get_count(queue) + 1
       enqueue(queue, my_unit)
     unlock(can_access_queue)
     print("Produced ", my_unit)
