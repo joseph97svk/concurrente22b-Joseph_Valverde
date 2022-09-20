@@ -1,5 +1,8 @@
 #include "thread.hpp"
 
-class producer: thread {
+class producer: public thread {
+    public:
+    void* process (void* data);
 
+    void initThread(void* data);
 };

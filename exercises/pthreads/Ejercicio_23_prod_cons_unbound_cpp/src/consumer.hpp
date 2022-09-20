@@ -1,5 +1,8 @@
 #include "thread.hpp"
 
-class consumer: thread {
+class consumer: public thread {
+    public:
+    void* process (void* data);
 
+    void initThread(void* data);
 };

@@ -1,5 +1,6 @@
 #include <cstdlib>
-#include <semaphore>
+//#include <semaphore>
+#include <semaphore.h>
 #include <chrono>
 
 #include "queue.hpp"
@@ -23,18 +24,20 @@ struct simulation_data {
   size_t producer_count;
   size_t consumer_count;
 
-  queue<size_t> queue;
-
-  size_t next_unit;
-  std::mutex can_access_next_unit;
-
   double producer_min_delay;
   double producer_max_delay;
   double consumer_min_delay;
   double consumer_max_delay;
 
+  queue<size_t> queue;
 
-  std::mutex can_access_qeueue;
+  std::mutex can_access_next_unit;
+  size_t next_unit;
+  
+  //std::counting_semaphore can_consume;
+  sem_t can_consume;
+
+  std::mutex can_access_consumed_count;
   size_t consumed_count;
 
   public:
@@ -54,15 +57,13 @@ struct simulation_data {
   consumer_max_delay(consumer_max_delay),
   can_access_next_unit(),
   next_unit(0),
-  can_access_qeueue(),
+  can_access_consumed_count(),
   consumed_count(0){
-
+    sem_init(&this -> can_consume, 0, 0);
   }
 
   ~simulation_data() {
   }
-
-  
 
 };
 

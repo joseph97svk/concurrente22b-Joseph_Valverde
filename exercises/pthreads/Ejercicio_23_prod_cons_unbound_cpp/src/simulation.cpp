@@ -31,11 +31,20 @@ void simulation::analyzeArguments(int argc, char* argv[]) {
 }
 
 void simulation::createConsumersProducers() {
+  this -> producers.reserve(this -> simulation_data -> unit_count);
+  this -> consumers.reserve(this -> simulation_data -> unit_count);
+  
+  for (int thread = 0; thread < this -> simulation_data -> unit_count; ++thread) {
+    this -> producers.emplace_back(new class consumer());
+    this -> producers[thread] -> initThread(simulation_data);
 
+    this -> consumers.emplace_back(new class producer());
+    this -> consumers[thread] -> initThread(simulation_data);
+  }
 }
 
-void createThreads () {
-
+void simulation::createThreads () {
+  
 }
 
 void simulation::joinThreads() {
