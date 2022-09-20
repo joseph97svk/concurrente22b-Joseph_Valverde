@@ -35,7 +35,7 @@ size_t queue_get_count(queue_t* queue) {
 bool queue_is_empty(queue_t* queue) {
   assert(queue);
   pthread_mutex_lock(&queue->can_access_queue);
-  bool result = queue->head == NULL;
+    bool result = queue->head == NULL;
   pthread_mutex_unlock(&queue->can_access_queue);
   return result;
 }
