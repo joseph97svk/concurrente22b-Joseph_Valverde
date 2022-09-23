@@ -2,6 +2,8 @@
 /// This code is released under the GNU Public License version 3
 /// @author Jeisson Hidalgo-Céspedes <jeisson.hidalgo@ucr.ac.cr>
 
+#define SIMULATION
+
 #ifdef SIMULATION
 
 #include "ProducerConsumerTest.hpp"
