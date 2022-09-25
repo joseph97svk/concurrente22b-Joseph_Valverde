@@ -1,52 +1,101 @@
+// Copyright [2022] <Joseph Valverde>
 #include <iostream>
 #include <sstream>
 
 #include "simulation.hpp"
 
-void simulation::run (int argc, char* argv[]) {
-  analyzeArguments(argc, argv);
 
-  createConsumersProducers();
+const bool PRODUCER = 0;
+const bool CONSUMER = 1;
+
+void simulation::run(int argc, char* argv[]) {
+  this->analyzeArguments(argc, argv);
+
+  this->createConsumersProducers();
 }
 
 void simulation::analyzeArguments(int argc, char* argv[]) {
-  this -> simulation_data = new class simulation_data();
+  this->simulationData = new class simulationData();
   if (argc == 8) {
     std::istringstream argument1Buffer(argv[1]);
-    argument1Buffer >> simulation_data -> unit_count;
+    argument1Buffer >> simulationData -> unit_count;
     std::istringstream argument2Buffer(argv[2]);
-    argument2Buffer >> simulation_data -> producer_count;
+    argument2Buffer >> simulationData -> producer_count;
     std::istringstream argument3Buffer(argv[3]);
-    argument3Buffer >> simulation_data -> consumer_count;
+    argument3Buffer >> simulationData -> consumer_count;
     std::istringstream argument4Buffer(argv[4]);
-    argument4Buffer >> simulation_data -> producer_min_delay;
+    argument4Buffer >> simulationData -> producer_min_delay;
     std::istringstream argument5Buffer(argv[5]);
-    argument4Buffer >> simulation_data -> producer_max_delay;
+    argument4Buffer >> simulationData -> producer_max_delay;
     std::istringstream argument6Buffer(argv[6]);
-    argument4Buffer >> simulation_data -> consumer_min_delay;
+    argument4Buffer >> simulationData -> consumer_min_delay;
     std::istringstream argument7Buffer(argv[7]);
-    argument4Buffer >> simulation_data -> consumer_max_delay;
+    argument4Buffer >> simulationData -> consumer_max_delay;
   } else {
   }
 }
 
 void simulation::createConsumersProducers() {
-  this -> producers.reserve(this -> simulation_data -> unit_count);
-  this -> consumers.reserve(this -> simulation_data -> unit_count);
-  
-  for (int thread = 0; thread < this -> simulation_data -> unit_count; ++thread) {
-    this -> producers.emplace_back(new class consumer());
-    this -> producers[thread] -> initThread(simulation_data);
+  this->createThreads(PRODUCER);
+  this->createThreads(CONSUMER);
 
-    this -> consumers.emplace_back(new class producer());
-    this -> consumers[thread] -> initThread(simulation_data);
+  this->joinThreads();
+}
+
+void simulation::addThread(size_t threadType) {
+  std::shared_ptr<thread<struct simulationData*>> temp;
+
+  switch (threadType) {
+    case PRODUCER:
+      temp = std::shared_ptr<thread<struct simulationData*>>
+      (new class producer<struct simulationData*>());
+      this -> producers.emplace_back(temp);
+      break;
+    case CONSUMER:
+      temp = std::shared_ptr<thread<struct simulationData*>>
+      (new class consumer<struct simulationData*>());
+      this -> consumers.emplace_back(temp);
+      break;
+    default:
+      break;
+  }
+
+  temp -> initThread(this -> simulationData);
+}
+
+void simulation::createThreads(size_t threadType) {
+  switch (threadType) {
+    case PRODUCER:
+      this->producers.reserve(this->simulationData->producer_count);
+      break;
+    case CONSUMER:
+      this->consumers.reserve(this->simulationData->consumer_count);
+      break;
+    default:
+      break;
+  }
+
+  int64_t max = this->simulationData->consumer_count;
+
+  if (threadType == PRODUCER) {
+    max = this->simulationData->producer_count;
+  }
+
+  for (int thread = 0; thread < max; ++thread) {
+    this->addThread(threadType);
   }
 }
 
-void simulation::createThreads () {
-  
-}
-
 void simulation::joinThreads() {
+  for (size_t thread = 0;
+  thread < this->simulationData->producer_count;
+  ++thread) {
+    this->producers[thread]->join();
+  }
 
+  for (size_t thread = 0;
+  thread < this->simulationData->producer_count;
+  ++thread) {
+    this->consumers[thread]->join();
+  }
 }

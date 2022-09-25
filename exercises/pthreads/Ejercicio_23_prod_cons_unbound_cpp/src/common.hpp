@@ -1,9 +1,22 @@
+// Copyright [2022] <Joseph Valverde>
 #include <cstdlib>
-//#include <semaphore>
+#include <unistd.h>
 #include <semaphore.h>
 #include <chrono>
+#include <iostream>
 
 #include "queue.hpp"
+
+/// Declare four of the rule-of-the-five methods
+#define DECLARE_RULE4(Class, action) \
+  Class(const Class& other) = action; \
+  Class(Class&& other) = action; \
+  Class& operator=(const Class& other) = action; \
+  Class& operator=(Class&& other) = action
+
+/// Disable default methods for copying objects
+#define DISABLE_COPY(Class) \
+  DECLARE_RULE4(Class, delete)
 
 enum {
   ERR_NOMEM_SHARED = EXIT_FAILURE + 1,
@@ -19,7 +32,7 @@ enum {
   ERR_CREATE_THREAD,
 };
 
-struct simulation_data {
+struct simulationData {
   size_t unit_count;
   size_t producer_count;
   size_t consumer_count;
@@ -29,19 +42,19 @@ struct simulation_data {
   double consumer_min_delay;
   double consumer_max_delay;
 
-  queue<size_t> queue;
+  queue<size_t> threadQueue;
 
   std::mutex can_access_next_unit;
   size_t next_unit;
-  
-  //std::counting_semaphore can_consume;
+
+  // std::counting_semaphore can_consume;
   sem_t can_consume;
 
   std::mutex can_access_consumed_count;
   size_t consumed_count;
 
-  public:
-  simulation_data (size_t unit_count = 0,
+ public:
+  simulationData(size_t unit_count = 0,
   size_t producer_count = 0, size_t consumer_count = 0,
   double producer_min_delay = 0,
   double producer_max_delay = 0,
@@ -50,7 +63,6 @@ struct simulation_data {
   unit_count(unit_count),
   producer_count(producer_count),
   consumer_count(consumer_count),
-  queue(),
   producer_min_delay(producer_min_delay),
   producer_max_delay(producer_max_delay),
   consumer_min_delay(consumer_min_delay),
@@ -58,13 +70,12 @@ struct simulation_data {
   can_access_next_unit(),
   next_unit(0),
   can_access_consumed_count(),
-  consumed_count(0){
+  consumed_count(0) {
     sem_init(&this -> can_consume, 0, 0);
   }
 
-  ~simulation_data() {
+  ~simulationData() {
   }
-
 };
 
 double random_between(double min, double max);

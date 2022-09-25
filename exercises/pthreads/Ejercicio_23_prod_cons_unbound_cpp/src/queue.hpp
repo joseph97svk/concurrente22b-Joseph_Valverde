@@ -1,49 +1,54 @@
+// Copyright [2022] <Joseph Valverde>
 #include <queue>
 #include <mutex>
 
 template <typename dataType>
 class queue {
-  private:
-  std::queue* queue;
+  typedef std::queue<dataType> baseQueue;
+
+ private:
+  baseQueue* myQueue;
   std::mutex* can_access_queue;
 
-  public:
+ public:
   queue() {
-    this -> queue = new std::queue();
+    // cppcheck-suppress noCopyConstructor
+    // cppcheck-suppress noOperatorEq
+    this -> myQueue = new baseQueue();
     this -> can_access_queue = new std::mutex();
   }
 
-  queue(&queue other) {
-    this -> queue = other.queue;
-    this -> can_access_queue = other.can_access_queue;
-  }
+  queue(const queue& other) = delete;
+  queue(queue&& other) = delete;
+  queue& operator=(const queue& other) = delete;
+  queue& operator=(queue&& other) = delete;
 
   ~queue() {
-    delete(this -> queue);
+    delete(this -> myQueue);
     delete(this -> can_access_queue);
   }
 
   bool isEmpty() {
     this -> can_access_queue -> lock();
-      bool result = this -> queue -> empty();
-    this -> can_access_queue.unlock();
+      bool result = this -> myQueue -> empty();
+    this -> can_access_queue -> unlock();
 
     return isEmpty;
   }
 
   void enqueue(dataType data) {
     this -> can_access_queue -> lock();
-      this -> queue -> emplace(data);
-    this -> can_access_queue.unlock();
-  }
-
-  void dequeue(dataType* data) {
-    this -> can_access_queue -> lock();
-      this -> queue -> pop(data);
+      this -> myQueue -> emplace(data);
     this -> can_access_queue -> unlock();
   }
 
-  void clear() {
-
+  void dequeue(dataType* data) {
+    this -> can_access_queue->lock();
+      *data = this->myQueue->front();
+      this->myQueue->pop();
+    this->can_access_queue->unlock();
   }
-} ;
+
+  void clear() {
+  }
+};
