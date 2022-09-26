@@ -105,7 +105,6 @@ int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr) {
 /**
  * Processes and solves the numbers according to the 
  * Golbach conjecture
- * 
  */
 int32_t goldbach_process_sums(goldbach_arr_t* goldbach_arr) {
   int64_t size = goldbach_get_arr_count(goldbach_arr);
