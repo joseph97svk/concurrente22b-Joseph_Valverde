@@ -1,0 +1,13 @@
+main() 
+
+    create(goldbach_arr)
+    read_numbers into goldbach_arr
+    process_goldbach_nums()
+    print numbers from goldbach_arr
+
+
+process_goldbach_nums()
+
+    process numbers in goldbach_arr
+    check if there were errors
+    return if there were errors
