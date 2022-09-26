@@ -11,6 +11,15 @@ enum goldbach_conjecture_error {
 };
 
 /**
+ * @brief returns a set up goldbach_arr based on the
+ * arguments/paramenters
+ * @param argc amount of arguments
+ * @param argv arguments
+ * @return goldbach_arr_t* 
+ */
+goldbach_arr_t* goldbach_set_up(int argc, char* argv[]);
+
+/**
  * @brief reads the input to the console and adds them to the 
  * goldbach_arr for later processing
  * @details DOES NOT SOLVE anything, just reads.

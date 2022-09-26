@@ -39,6 +39,13 @@ typedef struct goldbach_arr goldbach_arr_t;
 goldbach_arr_t* goldbach_arr_create();
 
 /**
+ * @brief sets the goldbach_arr thread_amount
+ * 
+ * @param thread_amount to be set
+ */
+void goldbach_set_arr (goldbach_arr_t* arr, const int32_t thread_amount);
+
+/**
  * @brief Adds a number to dynamic array goldbach_arr
  * @param arr where the number will be stored
  * @param num that will be stored in goldbach_arr

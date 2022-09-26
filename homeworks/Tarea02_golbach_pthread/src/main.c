@@ -14,11 +14,11 @@
  */
 int process_goldbach_nums(goldbach_arr_t* goldbach_arr);
 
-int main(void) {
+int main(int argc, char* argv[]) {
   int32_t goldbach_error = EXIT_SUCCESS;
 
   // declare goldbach_arr
-  goldbach_arr_t* goldbach_arr = goldbach_arr_create();
+  goldbach_arr_t* goldbach_arr = goldbach_set_up(argc, argv);
 
   if (goldbach_arr == NULL) {
     fprintf(stderr, "error: Goldbach_arr memory could not be allocated\n");

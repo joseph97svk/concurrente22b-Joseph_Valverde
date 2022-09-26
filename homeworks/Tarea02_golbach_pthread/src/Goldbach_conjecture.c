@@ -82,6 +82,30 @@ int64_t find_next_prime(const int64_t last_prime);
 
 bool isPrimeNum(const int64_t number);
 
+
+/**
+ * @brief returns a set up goldbach_arr based on the
+ * arguments/paramenters
+ * @param argc amount of arguments
+ * @param argv arguments
+ * @return goldbach_arr_t* 
+ */
+goldbach_arr_t* goldbach_set_up(int argc, char* argv[]) {
+  if (argc > 2) {
+    return NULL;
+  }
+
+  goldbach_arr_t* goldbach_arr = goldbach_arr_create();
+
+  if (argc == 2) {
+    int32_t thread_amount = 0;
+    sscanf(argv[1], "%i", &thread_amount);
+    goldbach_set_arr(goldbach_arr, thread_amount);
+  }
+
+  return goldbach_arr;
+}
+
 /**
  * @brief reads the input to the console and adds them to the 
  * goldbach_arr for later processing
