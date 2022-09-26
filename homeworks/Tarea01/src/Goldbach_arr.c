@@ -390,7 +390,6 @@ const int64_t num_position, const int64_t sum_position) {
 
 /**
  * deallocates all memory allocated for goldbach_arr
- * 
  */
 void goldbach_arr_destroy(goldbach_arr_t* arr) {
   // for all elements in the array
