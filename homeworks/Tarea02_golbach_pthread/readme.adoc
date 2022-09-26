@@ -1,0 +1,99 @@
+= Tarea01: goldbach_serial = 
+
+== Summary ==
+*Author(s):* Joseph Valverde
+
+:description:  Implementation of the goldbach conjecture in the C programming language.
+:keywords:  prime numbers, weak goldbach conjecture, strong goldbach conjecture
+
+*Description:* {description}
+
+*Keywords:* {keywords}
+
+== Analisis ==
+
+=== Description ===
+
+The objective is to find, according to the goldbach conjecture, the sum of prime numbers that equal to the given number. The goldbach conjecture is made of two distinct conjectures depending on whether the number is even or odd. According to the strong conjecture, for every even number greater than 5, there exists a sum of two prime numbers that equal said given number. According to the weak conjecture, for every odd number greater than 5, there exists a sum of 3 prime numbers that equal said given number. 
+
+In order to find such said numbers, the program will be required to read a list of numbers through the stardard input in the console. These numbers can be either positive, or negative. In the case of the negative ones, these are computed as positive ones, however the sign is considered for the printing of results, as this is considered as a flag to print all the sums found, rather than just the amount of sums found. After all said numbers are given, the program is to compute the sums according to the goldbach conjectures. Finally the results are to be printed on the stardard output on the operating sistem console, where, one the first line the amount of numbers given and total amount of sums computed are given, and on the subsequent lines, the number, amount of sums for this number, and if directed, the sums are printed. 
+
+=== User Manual ===
+
+==== Execution ====
+In order to use the program type on the console:
+
+""file_location"/Tarea01" or more commonly "bin/Tarea01" depending on the location of the executable.
+
+
+==== Input Stage: feeding the numbers ====
+
+At start, the program will read all given input. Each input is separated by a next line, after which the next input considered a different one. If given a next line without a given input, the program will consider the input stage done and will begin processing the numbers given by the user.
+
+==== Allowed inputs ====
+The input is regulated and will only allow numbers up to 2^63-1. It will also only allow integers. Any other type of input will prompt an error message and stop the execution of the program. 
+
+==== Choosing the output type ====
+
+The given numbers can be either positive or negative, these will however always be computed as positive integers.
+
+All output will always print on each line, the number at the given position and the amount of sums found for said given number. For negative numbers, however, the program will print said calculated sums too.
+
+
+=== Credits ===
+
+==== Designed and implemented by: ====
+
+Joseph Stuart Valverde Kong
+
+UCR student in Computación en varios Énfasis, C 18100
+
+*Email:* joseph.valverdekong@ucr.ac.cr
+
+==== Supporting sources: ====
+
+Primality Test (Wikipedia)
+
+*Found in:* https://en.wikipedia.org/wiki/Primality_test 
+
+*Use:*  Finding an mathematical principal that leads to an efficient algorithm capable of determining wether a given integer is prime or not. 
+
+The choosen math principle is dictates that all prime numbers can be represented as 6k +/- 1 and that there is irrelevant and redundant looking for a factor greater than sqrt(n) to determine if a number is prime or not. 
+
+
+== Design ==
+
+Design of the solution that is implemented.
+
+=== Data Structure ===
+
+[#img-design/Diagrama de memoria.png]
+image::design/Diagrama de memoria.png[]
+
+The main data structure is the "goldbach_arr", a dynamic array holding what we will call the "goldbach_element". What goldbach_arr holds, however, is a pointer address to the array itself. This address begining at this address holds each of the goldbach_elements in the goldbach_arr. 
+
+The goldbach_element(s) will hold the number, the amount of sums and a pointer address to an array of sums. This array, however does not holds the sums themselves, instead the adresses to the location of the sums themselves stored in arrays themselves. 
+
+[#img-design/C0117-T1.png]
+image::design/C0117-T1.png[]
+
+The goldbach_element(s) will each hold the number to be (or already) processed, the amount of sums found and a 2D array holding the sums. 
+
+The goldbach_arr contains a array of goldbach_element(s). The goldbach_arr will hold its capacity or space available, its count or amount of elements added, the total amount of sums found already and the goldbach_element(s).
+
+=== Pseudocode ===
+
+==== main ====
+
+include::design/main.pseudo[]
+
+
+==== golbach_conjecture ====
+
+include::design/goldbach_conjecture.pseudo[]
+
+
+==== goldbach_arr ====
+
+include::design/goldbach_arr.pseudo[]
+
