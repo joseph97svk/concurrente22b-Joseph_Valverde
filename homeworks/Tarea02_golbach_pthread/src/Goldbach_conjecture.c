@@ -29,8 +29,30 @@ typedef struct goldbach_num_process_data {
 bool num_validity_check(char string[64], int64_t* value);
 
 /**
- * @brief Processess a given number according to the goldbach conjecture
+ * @brief checks the first char of a char string for its validity
  * 
+ * @param string char string to be checked
+ * @param minus_found amount of '-' found
+ * @param num_found if what has been found so far is a number
+ * @return true 
+ * @return false 
+ */
+bool check_first_char(char string[64], int32_t* minus_found, bool* num_found);
+
+/**
+ * @brief Checks all characters in a string to check if they are valid
+ * 
+ * @param string char string to be checked
+ * @param minus_found amount of '-' found
+ * @param num_found if what has been found so far is a number
+ * @return true 
+ * @return false 
+ */
+bool check_all_chars(char string[64], int32_t* minus_found, bool* num_found);
+
+/**
+ * @brief Processess a given number according to the goldbach conjecture
+ * @details Handles multi-threaded related operations
  * @param goldbach_arr where the results will be stored
  * @param number number to be processed
  * @param position position within the goldbach_arr of the number
@@ -38,6 +60,16 @@ bool num_validity_check(char string[64], int64_t* value);
  */
 
 void* goldbach_process_num(void* data);
+
+/**
+ * @brief Processes operations to determine goldbach sums
+ * 
+ * @param goldbach_data 
+ * @param position 
+ * @return int32_t 
+ */
+int32_t num_golbach_process(goldbach_num_process_data_t* goldbach_data,
+const int64_t position);
 
 /**
  * @brief processes an odd number according to the goldbach conjecture
@@ -88,6 +120,29 @@ int64_t find_next_prime(const int64_t last_prime);
 
 bool isPrimeNum(const int64_t number);
 
+/**
+ * @brief Prints the amount of sums found for a given number
+ * 
+ * @param goldbach_arr
+ * @param sum_amount amount of sums found for the number
+ * @param current_num the actual number
+ * @param num position of the number within the array
+ */
+void print_sums_amount(goldbach_arr_t* goldbach_arr, int64_t* sum_amount,
+const int64_t current_num, const int num);
+
+/**
+ * @brief prints the actual sums found for a given number
+ * 
+ * @param goldbach_arr 
+ * @param sum_amount amount of sums found for the number
+ * @param current_sum temp array for the sum
+ * @param size size of each sum
+ * @param num position of the number in the array 
+ */
+void print_sums_for_num(goldbach_arr_t* goldbach_arr,
+const int64_t sum_amount, int64_t* current_sum,
+int64_t* size, const int64_t num);
 
 /**
  * @brief returns a set up goldbach_arr based on the
@@ -176,6 +231,95 @@ int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr) {
 }
 
 /**
+ * checks if the given input is valid and gives the value
+ * 
+ */
+bool num_validity_check(char string[64], int64_t* value) {
+  errno = 0;
+
+  char* end_ptr;
+
+  bool num_found = string[0] > 47 && string[0] < 58;
+  int32_t minus_found = 0;
+
+  if (!check_first_char(string, &minus_found, &num_found)) {
+    return false;
+  }
+
+  if (!check_all_chars(string, &minus_found, &num_found)) {
+    return false;
+  }
+
+  // change input to number
+  int64_t number = strtol(string, &end_ptr, 10); //NOLINT
+
+  // check if there was an overflow
+  if (errno != 0) {
+    return false;
+  }
+
+  *value = number;
+
+  return true;
+}
+
+/**
+ * Checks the first char of a char string for its validity
+ * 
+ */
+bool check_first_char(char string[64], int32_t* minus_found, bool* num_found) {
+  // if the first char is not a number
+  if (!*num_found && string[0] != 32) {
+    // if the first char is not num, and also not a minus
+    if (string[0] != '-') {
+      return false;
+    // otherwise if is minus but is only that
+    } else if (strlen(string) == 1) {
+      return false;
+    }
+    (*minus_found)++;
+  }
+
+  return true;
+}
+
+/**
+ * Checks all characters in a string to check if they are valid
+ * 
+ */
+bool check_all_chars(char string[64], int32_t* minus_found, bool* num_found) {
+  // begin checking at second char if it is num (first already checked)
+  for (size_t character = 1; character < strlen(string) - 1; character++) {
+    if (*minus_found > 1) {
+      return false;
+    }
+
+    if (!*num_found) {
+      if (string[character] == '-') {
+         (*minus_found)++;
+        if (string[character - 1] == '-') {
+          return false;
+        }
+        continue;
+      } else if (string[character] == 32 &&
+      *minus_found > 0) {
+        return false;
+      }
+    }
+
+    *num_found = string[character] > 47 && string[character] < 58;
+
+    // if subsequent chars are not nums
+    if (!*num_found && string[character] != 32) { // NOLINT
+      // then invalid
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
  * Processes and solves the numbers according to the 
  * Golbach conjecture
  */
@@ -222,6 +366,44 @@ int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture) {
   return num_process_error;
 }
 
+/**
+ * Processess a given number according to the goldbach conjecture
+ * Mostly thread related 
+ */
+void* goldbach_process_num(void* data) {
+  goldbach_num_process_data_t* goldbach_data =
+  (goldbach_num_process_data_t*) data;
+
+  goldbach_arr_t* goldbach_arr = goldbach_data->goldbach_arr;
+  int64_t position = 0;
+
+  int32_t num_process_error = EXIT_SUCCESS;
+
+  // look for numbers while there are number to process
+  while (true) {
+    pthread_mutex_lock(&(goldbach_data->can_access_position)); {
+      position = goldbach_data->position;
+      (goldbach_data->position)++;
+    } pthread_mutex_unlock(&(goldbach_data->can_access_position));
+
+    // if out of bounds, quit
+    if (position >= goldbach_get_arr_count(goldbach_arr)) {
+      break;
+    }
+
+    num_process_error = num_golbach_process(goldbach_data, position);
+
+    if (num_process_error != EXIT_SUCCESS) {
+      return (void*)(int64_t)num_process_error;
+    }
+  }
+  return (void*)(int64_t)num_process_error;
+}
+
+/**
+ * Processes operations to determine goldbach sums
+ * 
+ */
 int32_t num_golbach_process(goldbach_num_process_data_t* goldbach_data,
 const int64_t position) {
   int32_t num_process_error = EXIT_SUCCESS;
@@ -252,40 +434,6 @@ const int64_t position) {
   }
 
   return num_process_error;
-}
-
-/**
- * Processess a given number according to the goldbach conjecture
- *  
- */
-void* goldbach_process_num(void* data) {
-  goldbach_num_process_data_t* goldbach_data =
-  (goldbach_num_process_data_t*) data;
-
-  goldbach_arr_t* goldbach_arr = goldbach_data->goldbach_arr;
-  int64_t position = 0;
-
-  int32_t num_process_error = EXIT_SUCCESS;
-
-  // look for numbers while there are number to process
-  while (true) {
-    pthread_mutex_lock(&(goldbach_data->can_access_position)); {
-      position = goldbach_data->position;
-      (goldbach_data->position)++;
-    } pthread_mutex_unlock(&(goldbach_data->can_access_position));
-
-    // if out of bounds, quit
-    if (position >= goldbach_get_arr_count(goldbach_arr)) {
-      break;
-    }
-
-    num_process_error = num_golbach_process(goldbach_data, position);
-
-    if (num_process_error != EXIT_SUCCESS) {
-      return (void*)(int64_t)num_process_error;
-    }
-  }
-  return (void*)(int64_t)num_process_error;
 }
 
 /**
@@ -443,69 +591,6 @@ bool isPrimeNum(const int64_t number) {
 }
 
 /**
- * @brief Prints the amount of sums found for a given number
- * 
- * @param goldbach_arr
- * @param sum_amount amount of sums found for the number
- * @param current_num the actual number
- * @param num position of the number within the array
- */
-void print_sums_amount(goldbach_arr_t* goldbach_arr, int64_t* sum_amount,
-const int64_t current_num, const int num) {
-  if (sum_amount == NULL) {
-    return;
-  }
-
-  // print sums amount
-  *sum_amount = goldbach_get_sums_amount(goldbach_arr, num);
-
-  printf("%" PRId64 ": ", current_num);
-
-  // if none, print accordingly
-  if (*sum_amount == 0) {
-    printf("NA\n");
-  } else {  // otherwise print sums amount
-    printf("%" PRId64 " sums", *sum_amount);
-  }
-}
-
-/**
- * @brief prints the actual sums found for a given number
- * 
- * @param goldbach_arr 
- * @param sum_amount amount of sums found for the number
- * @param current_sum temp array for the sum
- * @param size size of each sum
- * @param num position of the number in the array 
- */
-void print_sums_for_num(goldbach_arr_t* goldbach_arr,
-const int64_t sum_amount, int64_t* current_sum,
-int64_t* size, const int64_t num) {
-  for (int64_t sum_in_num = 0;
-  sum_in_num < sum_amount; sum_in_num++) {
-    current_sum =
-    goldbach_get_sum(goldbach_arr, size, num, sum_in_num);
-
-    // for all numbers of the sum
-    for (int64_t sum_element = 0;
-    sum_element < *size; ++sum_element) {
-      // print the results
-      printf("%" PRId64 "", current_sum[sum_element]);
-      if (sum_element != *size - 1) {
-        printf(" + ");
-      }
-    }
-
-    // free the space of the given sum
-    free(current_sum);
-
-    if (sum_in_num != sum_amount - 1) {
-      printf(", ");
-    }
-  }
-}
-
-/**
  * Prints the results after processing the solutions
  */
 void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
@@ -538,101 +623,57 @@ void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
 }
 
 /**
- * @brief checks the first char of a char string for its validity
+ * Prints the amount of sums found for a given number
  * 
- * @param string char string to be checked
- * @param minus_found amount of '-' found
- * @param num_found if what has been found so far is a number
- * @return true 
- * @return false 
  */
-bool check_first_char(char string[64], int32_t* minus_found, bool* num_found) {
-  // if the first char is not a number
-  if (!*num_found && string[0] != 32) {
-    // if the first char is not num, and also not a minus
-    if (string[0] != '-') {
-      return false;
-    // otherwise if is minus but is only that
-    } else if (strlen(string) == 1) {
-      return false;
-    }
-    (*minus_found)++;
+void print_sums_amount(goldbach_arr_t* goldbach_arr, int64_t* sum_amount,
+const int64_t current_num, const int num) {
+  if (sum_amount == NULL) {
+    return;
   }
 
-  return true;
+  // print sums amount
+  *sum_amount = goldbach_get_sums_amount(goldbach_arr, num);
+
+  printf("%" PRId64 ": ", current_num);
+
+  // if none, print accordingly
+  if (*sum_amount == 0) {
+    printf("NA\n");
+  } else {  // otherwise print sums amount
+    printf("%" PRId64 " sums", *sum_amount);
+  }
 }
 
 /**
- * @brief Checks all characters in a string to check if they are valid
+ * Prints the actual sums found for a given number
  * 
- * @param string char string to be checked
- * @param minus_found amount of '-' found
- * @param num_found if what has been found so far is a number
- * @return true 
- * @return false 
  */
-bool check_all_chars(char string[64], int32_t* minus_found, bool* num_found) {
-  // begin checking at second char if it is num (first already checked)
-  for (size_t character = 1; character < strlen(string) - 1; character++) {
-    if (*minus_found > 1) {
-      return false;
-    }
+void print_sums_for_num(goldbach_arr_t* goldbach_arr,
+const int64_t sum_amount, int64_t* current_sum,
+int64_t* size, const int64_t num) {
+  for (int64_t sum_in_num = 0;
+  sum_in_num < sum_amount; sum_in_num++) {
+    current_sum =
+    goldbach_get_sum(goldbach_arr, size, num, sum_in_num);
 
-    if (!*num_found) {
-      if (string[character] == '-') {
-         (*minus_found)++;
-        if (string[character - 1] == '-') {
-          return false;
-        }
-        continue;
-      } else if (string[character] == 32 &&
-      *minus_found > 0) {
-        return false;
+    // for all numbers of the sum
+    for (int64_t sum_element = 0;
+    sum_element < *size; ++sum_element) {
+      // print the results
+      printf("%" PRId64 "", current_sum[sum_element]);
+      if (sum_element != *size - 1) {
+        printf(" + ");
       }
     }
 
-    *num_found = string[character] > 47 && string[character] < 58;
+    // free the space of the given sum
+    free(current_sum);
 
-    // if subsequent chars are not nums
-    if (!*num_found && string[character] != 32) {
-      // then invalid
-      return false;
+    if (sum_in_num != sum_amount - 1) {
+      printf(", ");
     }
   }
-
-  return true;
 }
 
-/**
- * checks if the given input is valid and gives the value
- * 
- */
-bool num_validity_check(char string[64], int64_t* value) {
-  errno = 0;
-
-  char* end_ptr;
-
-  bool num_found = string[0] > 47 && string[0] < 58;
-  int32_t minus_found = 0;
-
-  if (!check_first_char(string, &minus_found, &num_found)) {
-    return false;
-  }
-
-  if (!check_all_chars(string, &minus_found, &num_found)) {
-    return false;
-  }
-
-  // change input to number
-  int64_t number = strtol(string, &end_ptr, 10); //NOLINT
-
-  // check if there was an overflow
-  if (errno != 0) {
-    return false;
-  }
-
-  *value = number;
-
-  return true;
-}
 
