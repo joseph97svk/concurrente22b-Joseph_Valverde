@@ -6,6 +6,8 @@
 
 #include "Thread.hpp"
 
+#define EXIT_SUCCESS 0
+
 Thread::Thread() {
 }
 

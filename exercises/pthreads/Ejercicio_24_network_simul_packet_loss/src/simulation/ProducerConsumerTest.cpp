@@ -76,7 +76,7 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
 
 int ProducerConsumerTest::analyzeArguments(int argc, char* argv[]) {
   // 5 + 1 arguments are mandatory
-  if ( argc != 6 ) {
+  if ( argc < 6 ) {
     std::cout << usage;
     return EXIT_FAILURE;
   }
@@ -87,6 +87,10 @@ int ProducerConsumerTest::analyzeArguments(int argc, char* argv[]) {
   this->productorDelay = std::atoi(argv[index++]);
   this->dispatcherDelay = std::atoi(argv[index++]);
   this->consumerDelay = std::atoi(argv[index++]);
+
+  if (argc == 7) {
+    this->packageLossPercentage = std::atof(argv[index++]);
+  }
 
   // todo: Validate that given arguments are fine
   return EXIT_SUCCESS;

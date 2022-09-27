@@ -31,13 +31,19 @@ class Assembler
   /// Objects of this class cannot be copied
   DISABLE_COPY(Assembler);
 
+ private:
+
+  double packageLossPercentage;
+
  public:
   /// Constructor
   explicit Assembler(Queue<ConsumingType>* consumingQueue = nullptr
     , Queue<ProducingType>* producingQueue = nullptr
-    , const ConsumingType& stopCondition = ConsumingType())
+    , const ConsumingType& stopCondition = ConsumingType()
+    , double packageLossPercentage = 0)
     : Consumer<ConsumingType>(consumingQueue, stopCondition)
-    , Producer<ProducingType>(producingQueue) {
+    , Producer<ProducingType>(producingQueue)
+    , packageLossPercentage(packageLossPercentage) {
   }
 
   /// Destructor

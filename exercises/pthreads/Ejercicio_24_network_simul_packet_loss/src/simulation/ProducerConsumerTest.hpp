@@ -6,6 +6,7 @@
 #define PRODUCERCONSUMERTEST_HPP
 
 #include <vector>
+#include <cstdlib>
 
 #include "common.hpp"
 
@@ -32,6 +33,8 @@ class ProducerConsumerTest {
   int dispatcherDelay = 0;
   /// Delay of consumer to consume a package, negative for max random
   int consumerDelay = 0;
+
+  double packageLossPercentage = 0;
 
  private:
   /// Producer of the simulated network messages
