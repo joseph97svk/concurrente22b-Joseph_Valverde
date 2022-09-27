@@ -2,9 +2,6 @@
 #include "Goldbach_arr.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
-#include <unistd.h>
-
 
 /**
  * @brief struct holding a number and its sums
@@ -28,8 +25,6 @@ struct goldbach_arr {
   int64_t count;  // amount of contents
   int64_t total_sums_amount;  // sums between all elements in arr
   goldbach_element_t* elements;  // the elements with their numbers
-  int32_t thread_amount;
-  pthread_t* threads;
 };
 
 /**
@@ -39,6 +34,26 @@ struct goldbach_arr {
  * @return int32_t 
  */
 int32_t goldbach_element_init(goldbach_element_t* element);
+
+/**
+ * @brief checks for valid positioning and null pointers
+ * 
+ * @param arr goldbach_arr
+ * @param sum the sum to be added to the array
+ * @param position position of the number whose sum is being added
+ * @return int32_t 
+ */
+int32_t check_sum_params(goldbach_arr_t* arr,
+const int64_t* const sum, const int64_t position);
+
+/**
+ * @brief increases the capacity if needed and the related counters
+ * 
+ * @param arr golbach_arr
+ * @param position of the number whose sum is being added
+ * @return int32_t 
+ */
+int32_t increase_sums_size(goldbach_arr_t* arr, const int64_t position);
 
 /**
  * @brief Deletes the goldbach element 
@@ -63,8 +78,6 @@ goldbach_arr_t* goldbach_arr_create() {
     new_goldbach_arr -> elements =
     calloc(new_goldbach_arr -> capacity,
     sizeof(goldbach_element_t));
-    new_goldbach_arr -> thread_amount = sysconf(_SC_NPROCESSORS_ONLN);
-    new_goldbach_arr -> threads = NULL;
 
     /** if memory for elements could not be allocated, the goldbach arr creation
      * was not succesful, then free allocated space and return null
@@ -79,14 +92,6 @@ goldbach_arr_t* goldbach_arr_create() {
 }
 
 /**
- * Sets the goldbach_arr thread_amount
- * 
- */
-void goldbach_set_arr (goldbach_arr_t* arr, const int32_t thread_amount) {
-  arr -> thread_amount = thread_amount;
-}
-
-/**
  * Initializes a goldbach_element
  * 
  */
@@ -98,7 +103,6 @@ int32_t goldbach_element_init(goldbach_element_t* element) {
 
   return EXIT_SUCCESS;
 }
-
 
 /**
  * Deletes the goldbach element 
@@ -194,10 +198,6 @@ int32_t increase_sums_size(goldbach_arr_t* arr, const int64_t position) {
     arr -> elements[position].sums = sums_buffer;
   }
 
-  // increase sum amount
-  arr -> elements[position].sum_amount =
-  (arr -> elements[position].sum_amount) + 1;
-
   return EXIT_SUCCESS;
 }
 
@@ -281,7 +281,6 @@ const int64_t* const sum, const int64_t position) {
   }
 
   // increase sums counter
-  (arr -> total_sums_amount) += 1;
   return error;
 }
 
@@ -289,7 +288,7 @@ const int64_t* const sum, const int64_t position) {
  * increases a number sum count without adding sums
  * 
  */
-void goldbach_add_ghost_sum(goldbach_arr_t* arr, const int64_t position) {
+void goldbach_increment_count(goldbach_arr_t* arr, const int64_t position) {
   (arr -> elements[position].sum_amount) += 1;
   (arr -> total_sums_amount) += 1;
 }
