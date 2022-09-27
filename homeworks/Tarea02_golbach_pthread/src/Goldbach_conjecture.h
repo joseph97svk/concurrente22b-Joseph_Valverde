@@ -1,5 +1,7 @@
 // Copyright 2022 Joseph Valverde <joseph.valverdekong@ucr.ac.cr>
 #include "Goldbach_arr.h"
+#include <pthread.h>
+#include <unistd.h>
 
 /**
  * @brief enum for error handling
@@ -10,6 +12,12 @@ enum goldbach_conjecture_error {
     error_sum_memory_allocation_failure,
 };
 
+typedef struct goldbach_conjecture {
+  goldbach_arr_t* goldbach_arr;
+  pthread_t* threads;
+  int32_t thread_amount;
+} goldbach_conjecture_t;
+
 /**
  * @brief returns a set up goldbach_arr based on the
  * arguments/paramenters
@@ -17,7 +25,7 @@ enum goldbach_conjecture_error {
  * @param argv arguments
  * @return goldbach_arr_t* 
  */
-goldbach_arr_t* goldbach_set_up(int argc, char* argv[]);
+goldbach_conjecture_t* goldbach_set_up(int argc, char* argv[]);
 
 /**
  * @brief reads the input to the console and adds them to the 
@@ -38,7 +46,7 @@ int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr);
  * to be processed are store and where solutions will be stored
  * @return int32_t error-success state
  */
-int32_t goldbach_process_sums(goldbach_arr_t* goldbach_arr);
+int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture);
 
 /**
  * @brief Prints the results after processing the solutions
