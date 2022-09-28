@@ -12,11 +12,9 @@ enum goldbach_conjecture_error {
     error_sum_memory_allocation_failure,
 };
 
-typedef struct goldbach_conjecture {
-  goldbach_arr_t* goldbach_arr;
-  pthread_t* threads;
-  int32_t thread_amount;
-} goldbach_conjecture_t;
+struct goldbach_conjecture;
+
+typedef struct goldbach_conjecture goldbach_conjecture_t;
 
 /**
  * @brief returns a set up goldbach_arr based on the
@@ -36,7 +34,7 @@ goldbach_conjecture_t* goldbach_set_up(int argc, char* argv[]);
  * will be stored
  * @return int32_t error-success state
  */
-int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr);
+int32_t goldbach_read_numbers(goldbach_conjecture_t* goldbach_conjecture);
 
 /**
  * @brief Processes and solves the numbers according to the 
@@ -54,4 +52,11 @@ int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture);
  * 
  * @param goldbach_arr goldbach_arr from where sums are extracted
  */
-void goldbach_print_sums(goldbach_arr_t* goldbach_arr);
+void goldbach_print_sums(goldbach_conjecture_t* goldbach_conjecture);
+
+/**
+ * @brief Frees all alocated memory for goldbach_conjecture
+ * 
+ * @param goldbach_arr 
+ */
+void goldbach_conjecture_destroy(goldbach_conjecture_t* goldbach_conjecture);

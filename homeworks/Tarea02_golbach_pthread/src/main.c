@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
   }
 
   // read values into it
-  goldbach_error = goldbach_read_numbers(goldbach_conjecture->goldbach_arr);
+  goldbach_error = goldbach_read_numbers(goldbach_conjecture);
 
   // check if reading numbers was successful
   switch (goldbach_error) {
@@ -48,15 +48,11 @@ int main(int argc, char* argv[]) {
   // if processing values was successful
   if (goldbach_error == EXIT_SUCCESS) {
     // print the results
-    goldbach_print_sums(goldbach_conjecture->goldbach_arr);
-  }
-
-  if (goldbach_conjecture->goldbach_arr !=  NULL) {
-    goldbach_arr_destroy(goldbach_conjecture->goldbach_arr);
+    goldbach_print_sums(goldbach_conjecture);
   }
 
   if (goldbach_conjecture !=  NULL) {
-    free(goldbach_conjecture);
+    goldbach_conjecture_destroy(goldbach_conjecture);
   }
 
   return goldbach_error;

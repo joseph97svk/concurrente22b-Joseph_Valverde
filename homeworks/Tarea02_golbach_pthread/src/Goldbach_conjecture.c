@@ -10,12 +10,13 @@
 
 #include "Goldbach_conjecture.h"
 
-typedef struct goldbach_num_process_data {
+typedef struct goldbach_conjecture {
   goldbach_arr_t* goldbach_arr;
+  pthread_t* threads;
+  int32_t thread_amount;
   int64_t position;
-  pthread_mutex_t can_access_array;
   pthread_mutex_t can_access_position;
-} goldbach_num_process_data_t;
+} goldbach_conjecture_t;
 
 /**
  * @brief checks if the given input is valid and gives the value
@@ -68,7 +69,7 @@ void* goldbach_process_num(void* data);
  * @param position 
  * @return int32_t 
  */
-int32_t num_golbach_process(goldbach_num_process_data_t* goldbach_data,
+int32_t num_golbach_process(goldbach_conjecture_t* goldbach_data,
 const int64_t position);
 
 /**
@@ -80,7 +81,7 @@ const int64_t position);
  * @return int32_t 
  */
 
-int32_t goldbach_odd_process(goldbach_num_process_data_t* goldbach_data,
+int32_t goldbach_odd_process(goldbach_conjecture_t* goldbach_data,
 const int64_t num, bool positive, const int64_t position);
 
 /**
@@ -92,7 +93,7 @@ const int64_t num, bool positive, const int64_t position);
  * @return int32_t 
  */
 
-int32_t goldbach_even_process(goldbach_num_process_data_t* goldbach_data,
+int32_t goldbach_even_process(goldbach_conjecture_t* goldbach_data,
 const int64_t num, bool positive, const int64_t position);
 
 /**
@@ -192,7 +193,7 @@ goldbach_conjecture_t* goldbach_set_up(int argc, char* argv[]) {
  * will be stored
  * @return int32_t error-success state
  */
-int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr) {
+int32_t goldbach_read_numbers(goldbach_conjecture_t* goldbach_conjecture) {
   // space to read a value up to 64 digits
   char input_read[64];
   int64_t current_val_read = 0;
@@ -211,7 +212,7 @@ int32_t goldbach_read_numbers(goldbach_arr_t* goldbach_arr) {
     if (num_validity_check(input_read, &current_val_read)) {
       // if valid, add them
       number_addition_error =
-      goldbach_add_num(goldbach_arr, current_val_read);
+      goldbach_add_num(goldbach_conjecture->goldbach_arr, current_val_read);
 
       if (number_addition_error != EXIT_SUCCESS) {
         return number_addition_error;
@@ -329,12 +330,11 @@ int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture) {
   goldbach_conjecture->threads =
   calloc(goldbach_conjecture->thread_amount, sizeof(pthread_t));
 
-  goldbach_num_process_data_t* thread_data =
-  calloc(1, sizeof(goldbach_num_process_data_t));
+  goldbach_conjecture_t* thread_data =
+  calloc(1, sizeof(goldbach_conjecture_t));
   thread_data->goldbach_arr = goldbach_conjecture->goldbach_arr;
   thread_data->position = 0;
 
-  pthread_mutex_init(&(thread_data->can_access_array), NULL);
   pthread_mutex_init(&(thread_data->can_access_position), NULL);
 
   // for all elements/numbers in a goldbach_arr
@@ -371,8 +371,8 @@ int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture) {
  * Mostly thread related 
  */
 void* goldbach_process_num(void* data) {
-  goldbach_num_process_data_t* goldbach_data =
-  (goldbach_num_process_data_t*) data;
+  goldbach_conjecture_t* goldbach_data =
+  (goldbach_conjecture_t*) data;
 
   goldbach_arr_t* goldbach_arr = goldbach_data->goldbach_arr;
   int64_t position = 0;
@@ -404,7 +404,7 @@ void* goldbach_process_num(void* data) {
  * Processes operations to determine goldbach sums
  * 
  */
-int32_t num_golbach_process(goldbach_num_process_data_t* goldbach_data,
+int32_t num_golbach_process(goldbach_conjecture_t* goldbach_data,
 const int64_t position) {
   int32_t num_process_error = EXIT_SUCCESS;
 
@@ -440,7 +440,7 @@ const int64_t position) {
  * processes an odd number according to the goldbach conjecture
  * 
  */
-int32_t goldbach_odd_process(goldbach_num_process_data_t* goldbach_data,
+int32_t goldbach_odd_process(goldbach_conjecture_t* goldbach_data,
 const int64_t number, bool positive, const int64_t position) {
   const int32_t size = 3;
   int64_t third_number = 0;
@@ -478,10 +478,9 @@ const int64_t number, bool positive, const int64_t position) {
 
           num_process_error =
           goldbach_add_sum(goldbach_data->goldbach_arr, current_sum, position);
+        } else {
+          goldbach_add_ghost_sum(goldbach_data->goldbach_arr, position);
         }
-        pthread_mutex_lock(&(goldbach_data->can_access_array));
-          goldbach_increment_count(goldbach_data->goldbach_arr, position);
-        pthread_mutex_unlock(&(goldbach_data->can_access_array));
       }
     }
   }
@@ -497,7 +496,7 @@ const int64_t number, bool positive, const int64_t position) {
  * processes an even number according to the goldbach conjecture
  * 
  */
-int32_t goldbach_even_process(goldbach_num_process_data_t* goldbach_data,
+int32_t goldbach_even_process(goldbach_conjecture_t* goldbach_data,
 const int64_t number, bool positive, const int64_t position) {
   int32_t num_process_error = EXIT_SUCCESS;
 
@@ -522,10 +521,9 @@ const int64_t number, bool positive, const int64_t position) {
 
         num_process_error =
         goldbach_add_sum(goldbach_data->goldbach_arr, current_sum, position);
+      } else {
+        goldbach_add_ghost_sum(goldbach_data->goldbach_arr, position);
       }
-      pthread_mutex_lock(&(goldbach_data->can_access_array)); {
-        goldbach_increment_count(goldbach_data->goldbach_arr, position);
-      } pthread_mutex_unlock(&(goldbach_data->can_access_array));
     }
   }
 
@@ -593,20 +591,24 @@ bool isPrimeNum(const int64_t number) {
 /**
  * Prints the results after processing the solutions
  */
-void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
+void goldbach_print_sums(goldbach_conjecture_t* goldbach_conjecture) {
   int64_t size = 0, sum_amount = 0;
   int64_t* current_sum = NULL;
 
   // print totals
   printf("Total %" PRId64 " numbers %" PRId64 " sums\n\n",
-  goldbach_get_arr_count(goldbach_arr),
-  goldbach_arr_get_total_sums_amount(goldbach_arr));
+  goldbach_get_arr_count(goldbach_conjecture->goldbach_arr),
+  goldbach_arr_get_total_sums_amount(goldbach_conjecture->goldbach_arr));
 
   // for each number
-  for (int64_t num = 0; num < goldbach_get_arr_count(goldbach_arr); num++) {
-  int64_t current_num = goldbach_get_current_number(goldbach_arr, num);
+  for (int64_t num = 0;
+  num < goldbach_get_arr_count(goldbach_conjecture->goldbach_arr);
+  num++) {
 
-    print_sums_amount(goldbach_arr, &sum_amount, current_num, num);
+  int64_t current_num =
+  goldbach_get_current_number(goldbach_conjecture->goldbach_arr, num);
+
+    print_sums_amount(goldbach_conjecture->goldbach_arr, &sum_amount, current_num, num);
 
     if (sum_amount == 0) {
       continue;
@@ -616,7 +618,7 @@ void goldbach_print_sums(goldbach_arr_t* goldbach_arr) {
     if (current_num < 0) {
       printf(": ");
       // if so, for all sums for the given number
-      print_sums_for_num(goldbach_arr, sum_amount, current_sum, &size, num);
+      print_sums_for_num(goldbach_conjecture->goldbach_arr, sum_amount, current_sum, &size, num);
     }
     printf("\n");
   }
@@ -677,3 +679,14 @@ int64_t* size, const int64_t num) {
 }
 
 
+/**
+ * Frees all alocated memory for goldbach_conjecture
+ * 
+ */
+void goldbach_conjecture_destroy(goldbach_conjecture_t* goldbach_conjecture) {
+  goldbach_arr_destroy(goldbach_conjecture->goldbach_arr);
+
+  pthread_mutex_destroy(&goldbach_conjecture->can_access_position);
+
+  free(goldbach_conjecture);
+}

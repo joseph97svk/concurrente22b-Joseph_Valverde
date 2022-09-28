@@ -67,7 +67,7 @@ const int64_t* const sum, const int64_t position);
  * @param position location of the number
  * @return int32_t 
  */
-void goldbach_increment_count(goldbach_arr_t* arr, const int64_t position);
+void goldbach_add_ghost_sum(goldbach_arr_t* arr, const int64_t position);
 
 /**
  * @brief removes extra capacity allocated for numbers
