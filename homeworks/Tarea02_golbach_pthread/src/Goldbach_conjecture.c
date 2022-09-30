@@ -10,11 +10,13 @@
 
 #include "Goldbach_conjecture.h"
 
+typedef int64_t unit_t;
+
 typedef struct goldbach_conjecture {
   goldbach_arr_t* goldbach_arr;
   pthread_t* threads;
   int32_t thread_amount;
-  int64_t last_processed_position;
+  unit_t last_processed_position;
   pthread_mutex_t can_access_position;
 } goldbach_conjecture_t;
 
@@ -27,7 +29,7 @@ typedef struct goldbach_conjecture {
  * @return false if value is invalid
  */
 
-bool num_validity_check(char string[64], int64_t* value);
+bool num_validity_check(char string[64], unit_t* value);
 
 /**
  * @brief checks the first char of a char string for its validity
@@ -82,7 +84,7 @@ const int64_t position);
  */
 
 int32_t goldbach_odd_process(goldbach_conjecture_t* goldbach_data,
-const int64_t num, bool positive, const int64_t position);
+const unit_t num, bool positive, const int64_t position);
 
 /**
  * @brief processes an even number according to the goldbach conjecture
@@ -94,7 +96,7 @@ const int64_t num, bool positive, const int64_t position);
  */
 
 int32_t goldbach_even_process(goldbach_conjecture_t* goldbach_data,
-const int64_t num, bool positive, const int64_t position);
+const unit_t num, bool positive, const int64_t position);
 
 /**
  * @brief Finds the next prime number after the given number
@@ -105,7 +107,7 @@ const int64_t num, bool positive, const int64_t position);
  * @return int64_t 
  */
 
-int64_t find_next_prime(const int64_t last_prime);
+unit_t find_next_prime(const unit_t last_prime);
 
 /**
  * @brief checks if a given number is prime
@@ -119,7 +121,7 @@ int64_t find_next_prime(const int64_t last_prime);
  * @return false if the number is not prime
  */
 
-bool isPrimeNum(const int64_t number);
+bool isPrimeNum(const unit_t number);
 
 /**
  * @brief Prints the amount of sums found for a given number
@@ -130,7 +132,7 @@ bool isPrimeNum(const int64_t number);
  * @param num position of the number within the array
  */
 void print_sums_amount(goldbach_arr_t* goldbach_arr, int64_t* sum_amount,
-const int64_t current_num, const int num);
+const unit_t current_num, const int num);
 
 /**
  * @brief prints the actual sums found for a given number
@@ -142,7 +144,7 @@ const int64_t current_num, const int num);
  * @param num position of the number in the array 
  */
 void print_sums_for_num(goldbach_arr_t* goldbach_arr,
-const int64_t sum_amount, int64_t* current_sum,
+const int64_t sum_amount, unit_t* current_sum,
 int64_t* size, const int64_t num);
 
 /**
@@ -196,7 +198,7 @@ goldbach_conjecture_t* goldbach_set_up(int argc, char* argv[]) {
 int32_t goldbach_read_numbers(goldbach_conjecture_t* goldbach_conjecture) {
   // space to read a value up to 64 digits
   char input_read[64];
-  int64_t current_val_read = 0;
+  unit_t current_val_read = 0;
 
   int32_t number_addition_error = EXIT_SUCCESS;
 
@@ -235,7 +237,7 @@ int32_t goldbach_read_numbers(goldbach_conjecture_t* goldbach_conjecture) {
  * checks if the given input is valid and gives the value
  * 
  */
-bool num_validity_check(char string[64], int64_t* value) {
+bool num_validity_check(char string[64], unit_t* value) {
   errno = 0;
 
   char* end_ptr;
@@ -252,7 +254,7 @@ bool num_validity_check(char string[64], int64_t* value) {
   }
 
   // change input to number
-  int64_t number = strtol(string, &end_ptr, 10); //NOLINT
+  unit_t number = strtol(string, &end_ptr, 10); //NOLINT
 
   // check if there was an overflow
   if (errno != 0) {
@@ -330,9 +332,10 @@ int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture) {
   goldbach_conjecture->threads =
   calloc(goldbach_conjecture->thread_amount, sizeof(pthread_t));
 
-  if (goldbach_conjecture->thread_amount > 
+  if (goldbach_conjecture->thread_amount >
   goldbach_get_arr_count(goldbach_conjecture->goldbach_arr)) {
-    goldbach_conjecture->thread_amount = goldbach_get_arr_count(goldbach_conjecture->goldbach_arr);
+    goldbach_conjecture->thread_amount =
+    goldbach_get_arr_count(goldbach_conjecture->goldbach_arr);
   }
 
   goldbach_conjecture->last_processed_position = 0;
@@ -409,7 +412,7 @@ int32_t num_golbach_process(goldbach_conjecture_t* goldbach_data,
 const int64_t position) {
   int32_t num_process_error = EXIT_SUCCESS;
 
-  int64_t current_num =
+  unit_t current_num =
   goldbach_get_current_number(goldbach_data->goldbach_arr, position);
 
   bool positive = true;
@@ -442,13 +445,13 @@ const int64_t position) {
  * 
  */
 int32_t goldbach_odd_process(goldbach_conjecture_t* goldbach_data,
-const int64_t number, bool positive, const int64_t position) {
+const unit_t number, bool positive, const int64_t position) {
   const int32_t size = 3;
-  int64_t third_number = 0;
+  unit_t third_number = 0;
   int32_t num_process_error = EXIT_SUCCESS;
 
   // allocate space for the sum
-  int64_t* current_sum = malloc(size * sizeof(int64_t));
+  unit_t* current_sum = malloc(size * sizeof(unit_t));
 
   // defensive for current_sum
   if (current_sum == NULL) {
@@ -456,10 +459,10 @@ const int64_t number, bool positive, const int64_t position) {
   }
 
   // for each number less than half the given number
-  for (int64_t current_number = 2; current_number < number/2;
+  for (unit_t current_number = 2; current_number < number/2;
   current_number = find_next_prime(current_number)) {
     // for each number less than the number minus the current number by half
-    for (int64_t current_second_number = 2;
+    for (unit_t current_second_number = 2;
     current_second_number <= (number - current_number)/2;
     current_second_number = find_next_prime(current_second_number)) {
       /* find a third number (the number minus the current number and 
@@ -498,17 +501,17 @@ const int64_t number, bool positive, const int64_t position) {
  * 
  */
 int32_t goldbach_even_process(goldbach_conjecture_t* goldbach_data,
-const int64_t number, bool positive, const int64_t position) {
+const unit_t number, bool positive, const int64_t position) {
   int32_t num_process_error = EXIT_SUCCESS;
 
   const int32_t size = 2;
-  int64_t other_number = 0;
+  unit_t other_number = 0;
 
   // allocate space for the sum
-  int64_t* current_sum = malloc(size * sizeof(int64_t));
+  unit_t* current_sum = malloc(size * sizeof(unit_t));
 
   // for each current number less than half the given number
-  for (int64_t current_number = 2; current_number <= number/2;
+  for (unit_t current_number = 2; current_number <= number/2;
   current_number = find_next_prime(current_number)) {
     // define a other_number (given number - current_number)
     other_number = number - current_number;
@@ -539,9 +542,9 @@ const int64_t number, bool positive, const int64_t position) {
 /**
  * Finds the next prime number after the given number
  */
-int64_t find_next_prime(const int64_t last_prime) {
+unit_t find_next_prime(const unit_t last_prime) {
   // if even start at next number
-  int64_t number = last_prime + 1;
+  unit_t number = last_prime + 1;
 
   // if odd then advance one more
   if (last_prime % 2 != 0) {
@@ -564,8 +567,8 @@ int64_t find_next_prime(const int64_t last_prime) {
  * Based on the principle where all prime numbers greater than 3
  * can be representad as 6k + 1
  */
-bool isPrimeNum(const int64_t number) {
-  int64_t comparator = 5;
+bool isPrimeNum(const unit_t number) {
+  unit_t comparator = 5;
 
   // check if number is two or three
   if (number == 2 || number == 3) {
@@ -594,7 +597,7 @@ bool isPrimeNum(const int64_t number) {
  */
 void goldbach_print_sums(goldbach_conjecture_t* goldbach_conjecture) {
   int64_t size = 0, sum_amount = 0;
-  int64_t* current_sum = NULL;
+  unit_t* current_sum = NULL;
 
   // print totals
   printf("Total %" PRId64 " numbers %" PRId64 " sums\n\n",
@@ -605,11 +608,11 @@ void goldbach_print_sums(goldbach_conjecture_t* goldbach_conjecture) {
   for (int64_t num = 0;
   num < goldbach_get_arr_count(goldbach_conjecture->goldbach_arr);
   num++) {
-
-  int64_t current_num =
+  unit_t current_num =
   goldbach_get_current_number(goldbach_conjecture->goldbach_arr, num);
 
-    print_sums_amount(goldbach_conjecture->goldbach_arr, &sum_amount, current_num, num);
+    print_sums_amount(goldbach_conjecture->goldbach_arr,
+    &sum_amount, current_num, num);
 
     if (sum_amount == 0) {
       continue;
@@ -619,7 +622,8 @@ void goldbach_print_sums(goldbach_conjecture_t* goldbach_conjecture) {
     if (current_num < 0) {
       printf(": ");
       // if so, for all sums for the given number
-      print_sums_for_num(goldbach_conjecture->goldbach_arr, sum_amount, current_sum, &size, num);
+      print_sums_for_num(goldbach_conjecture->goldbach_arr,
+      sum_amount, current_sum, &size, num);
     }
     printf("\n");
   }
@@ -630,7 +634,7 @@ void goldbach_print_sums(goldbach_conjecture_t* goldbach_conjecture) {
  * 
  */
 void print_sums_amount(goldbach_arr_t* goldbach_arr, int64_t* sum_amount,
-const int64_t current_num, const int num) {
+const unit_t current_num, const int num) {
   if (sum_amount == NULL) {
     return;
   }
@@ -653,7 +657,7 @@ const int64_t current_num, const int num) {
  * 
  */
 void print_sums_for_num(goldbach_arr_t* goldbach_arr,
-const int64_t sum_amount, int64_t* current_sum,
+const int64_t sum_amount, unit_t* current_sum,
 int64_t* size, const int64_t num) {
   for (int64_t sum_in_num = 0;
   sum_in_num < sum_amount; sum_in_num++) {
