@@ -51,7 +51,16 @@ goldbach_add_sum()
     allocate space for the new sum
     for all numbers in the sum
         copy the numbers from the given sum into the element sums
-    
+    mutex_lock(can_access_arr)
+        increase num_sum_counter 
+        increase total_sum_counter
+    mutex_mutex_unlock(can_access_arr)
+
+goldbach_add_ghost_sum()
+    mutex_lock(can_access_arr)
+        increase num_sum_counter 
+        increase total_sum_counter
+    mutex_unlock(can_access_arr)
 
 goldbach_get_arr_count()
 

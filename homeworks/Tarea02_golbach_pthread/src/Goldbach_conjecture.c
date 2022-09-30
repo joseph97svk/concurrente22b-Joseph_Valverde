@@ -14,7 +14,7 @@ typedef struct goldbach_conjecture {
   goldbach_arr_t* goldbach_arr;
   pthread_t* threads;
   int32_t thread_amount;
-  int64_t position;
+  int64_t last_processed_position;
   pthread_mutex_t can_access_position;
 } goldbach_conjecture_t;
 
@@ -330,12 +330,14 @@ int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture) {
   goldbach_conjecture->threads =
   calloc(goldbach_conjecture->thread_amount, sizeof(pthread_t));
 
-  goldbach_conjecture_t* thread_data =
-  calloc(1, sizeof(goldbach_conjecture_t));
-  thread_data->goldbach_arr = goldbach_conjecture->goldbach_arr;
-  thread_data->position = 0;
+  if (goldbach_conjecture->thread_amount > 
+  goldbach_get_arr_count(goldbach_conjecture->goldbach_arr)) {
+    goldbach_conjecture->thread_amount = goldbach_get_arr_count(goldbach_conjecture->goldbach_arr);
+  }
 
-  pthread_mutex_init(&(thread_data->can_access_position), NULL);
+  goldbach_conjecture->last_processed_position = 0;
+
+  pthread_mutex_init(&(goldbach_conjecture->can_access_position), NULL);
 
   // for all elements/numbers in a goldbach_arr
   for (int64_t number = 0;
@@ -344,7 +346,7 @@ int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture) {
     // process each given number
     num_process_error =
     pthread_create(&goldbach_conjecture->threads[number], NULL,
-    goldbach_process_num, (void*)thread_data);
+    goldbach_process_num, (void*)goldbach_conjecture);
 
     if (num_process_error != EXIT_SUCCESS) {
       free(goldbach_conjecture->threads);
@@ -360,7 +362,6 @@ int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture) {
     (void*) &num_process_error);
   }
 
-  free(thread_data);
   free(goldbach_conjecture->threads);
 
   return num_process_error;
@@ -382,8 +383,8 @@ void* goldbach_process_num(void* data) {
   // look for numbers while there are number to process
   while (true) {
     pthread_mutex_lock(&(goldbach_data->can_access_position)); {
-      position = goldbach_data->position;
-      (goldbach_data->position)++;
+      position = goldbach_data->last_processed_position;
+      (goldbach_data->last_processed_position)++;
     } pthread_mutex_unlock(&(goldbach_data->can_access_position));
 
     // if out of bounds, quit

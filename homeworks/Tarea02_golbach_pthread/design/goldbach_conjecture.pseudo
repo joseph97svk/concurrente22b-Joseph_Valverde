@@ -32,14 +32,35 @@ validity_check()
 
 
 goldbach_process_sums()
+    allocate memory for threads
+    
+    last_access_position := 0
+
+    init_mutex(can_access_position)
 
     for all numbers in goldbach_arr
-        goldbach_process_num()
+        create_thread(threads[number], goldbach_process_num())
 
+    for all numbers in goldbach_arr
+        join_thread(threads[number])
 
 goldbach_process_num()
+  while (true)
+    mutex_lock(can_access_position)
+      position = last_access_position
+      last_access_position++
+    mutex_unlock(can_access_position)
 
-    if less than 0
+    if (position >= goldbach_get_arr_count())
+      break
+    
+    process_goldbach_num()
+  
+  end while
+   
+
+process_goldbach_num()
+   if less than 0
         make it positive
     
     if less than 6
@@ -49,7 +70,6 @@ goldbach_process_num()
         goldbach_even_process()
     else   
         goldbach_odd_process()
-    
 
 goldbach_even_process()
 
