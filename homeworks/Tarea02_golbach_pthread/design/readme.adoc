@@ -8,7 +8,9 @@ Design of the solution that is implemented.
 [#img-Diagrama de memoria.png]
 image::Diagrama de memoria.png[]
 
-The main data structure is the "goldbach_arr", a dynamic array holding what we will call the "goldbach_element". What goldbach_arr holds, however, is a pointer address to the array itself. This address begining at this address holds each of the goldbach_elements in the goldbach_arr. 
+The main data structure is the goldbach_conjecuture , which holds the goldbach_arr, the threads for concurrency, the amount of threads to be created, the position of the last number processed, and the mutex to access said position. It could be considered the brain that manages the information for processing, as well as the results and other necessary data for efficient processing that is not directly related to the goldbach numbers and as such not part of the goldbach_arr struct. 
+
+The dynamic array "goldbach_arr" holds what we will call the "goldbach_element". What goldbach_arr holds, however, is a pointer address to the array itself. This address begining at this address holds each of the goldbach_elements in the goldbach_arr. 
 
 The goldbach_element(s) will hold the number, the amount of sums and a pointer address to an array of sums. This array, however does not holds the sums themselves, instead the adresses to the location of the sums themselves stored in arrays themselves. 
 
