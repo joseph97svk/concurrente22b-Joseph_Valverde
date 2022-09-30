@@ -69,5 +69,5 @@ The choosen math principle is dictates that all prime numbers can be represented
 
 == Design ==
 
-Refer to link:<design/readme.adoc>[DESIGN] for design complete documentation. 
+Refer to link:design/readme.adoc[DESIGN] for design complete documentation. 
 
