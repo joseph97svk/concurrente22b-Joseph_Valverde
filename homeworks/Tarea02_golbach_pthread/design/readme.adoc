@@ -20,6 +20,10 @@ The goldbach_element(s) will each hold the number to be (or already) processed, 
 
 The goldbach_arr contains a array of goldbach_element(s). The goldbach_arr will hold its capacity or space available, its count or amount of elements added, the total amount of sums found already and the goldbach_element(s).
 
+[#img-Thread_mem_tracing.png]
+image::Thread_mem_tracing.png[]
+Memory representation of the thread management. Main thread spans as many threads as either the amount of numbers in the array, or the amount of threads directed. It will do the least of them. Most of the data is handled by the shared data struct named "goldbach_conjecture" and little on each subroutine itself. Notice how on thread2 as the number does not require processing, will not call an unecessary subroutine. 
+
 == Pseudocode ==
 
 === main ===
