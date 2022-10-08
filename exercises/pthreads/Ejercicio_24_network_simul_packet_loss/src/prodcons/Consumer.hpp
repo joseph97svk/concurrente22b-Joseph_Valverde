@@ -6,6 +6,7 @@
 #define CONSUMER_HPP
 
 #include <cassert>
+#include <iostream>
 
 #include "Queue.hpp"
 #include "Thread.hpp"
@@ -29,6 +30,8 @@ class Consumer : public virtual Thread {
   const DataType stopCondition;
   /// True if this consumer owns the queue and it must be deleted in destructor
   bool ownsQueue;
+
+  int id;
 
  public:
   /// Creates a consumer that uses an existing queue or creates its own
@@ -82,6 +85,7 @@ class Consumer : public virtual Thread {
         break;
       }
       // Process this data
+      // std::cout << "[" << this->id << "]" << std::endl;
       this->consume(data);
     }
   }

@@ -8,7 +8,7 @@
 #include <mutex>
 #include <queue>
 
-#include "common.hpp"
+#include "../common/common.hpp"
 #include "Semaphore.hpp"
 
 /**

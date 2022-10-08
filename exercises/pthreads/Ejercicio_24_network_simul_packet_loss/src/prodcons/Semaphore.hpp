@@ -7,7 +7,7 @@
 
 #include <semaphore.h>
 
-#include "common.hpp"
+#include "../common/common.hpp"
 
 // macOS only uses named semaphores
 #if __APPLE__ && __MACH__
