@@ -20,7 +20,6 @@ double packageLossPercentage):
 ConsumerTest(consumerDelay),
 ProducerTest(packageCount, productorDelay, consumerCount),
 packageLossPercentage(packageLossPercentage) {
-  std::cout << this->packageLossPercentage <<std::endl;
 }
 
 int AssemblerTest::run() {
@@ -50,6 +49,10 @@ void AssemblerTest::consume(NetworkMessage data) {
   }
 }
 
+void AssemblerTest::notifyEndToDispatcher() {
+  // Produce an empty message to communicate we finished
+  this->produce(NetworkMessage());
+}
 
 double generateRandomNumber() {
   std::random_device random;

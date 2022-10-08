@@ -24,4 +24,6 @@ public ConsumerTest, public ProducerTest {
   int run() override;
 
   void consume(NetworkMessage data) override;
+
+  void notifyEndToDispatcher();
 };

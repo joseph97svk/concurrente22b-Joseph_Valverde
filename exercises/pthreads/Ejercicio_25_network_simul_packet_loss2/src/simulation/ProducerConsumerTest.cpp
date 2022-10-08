@@ -27,6 +27,7 @@ ProducerConsumerTest::~ProducerConsumerTest() {
   delete this->dispatcher;
   for ( ConsumerTest* consumer : this->consumers )
     delete consumer;
+  delete this->assembler;
 }
 
 int ProducerConsumerTest::start(int argc, char* argv[]) {
@@ -42,27 +43,28 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
   this->dispatcher->createOwnQueue();
   // Create each producer
   this->consumers.resize(this->consumerCount);
-  // TODO: -1
-  for ( size_t index = 0; index < this->consumerCount -1; ++index ) {
+  // -1
+  for ( size_t index = 0; index < this->consumerCount; ++index ) { // CHANGE
     this->consumers[index] = new ConsumerTest(this->consumerDelay);
     assert(this->consumers[index]);
     this->consumers[index]->createOwnQueue();
   }
 
-  // TODO: add assembler
-  this->consumers[this->consumerCount -1] =
+  // add assembler
+  this->assembler = // CHANGE
   new AssemblerTest(this->consumerDelay,
   0, 0, this->consumerCount, this->packageLossPercentage);
 
-  // TODO: setProducing Queue for assembler
-  this->consumers[this->consumerCount-1]->createOwnQueue();
-  // TODO: set producing queue for assembler
-  dynamic_cast<ProducerTest*>(this->consumers[this->consumerCount-1])->
+  // set Producing Queue for assembler
+  this->assembler->createOwnQueue(); // CHANGE
+  // set producing queue for assembler
+  dynamic_cast<ProducerTest*>(this->assembler)-> // CHANGE
   setProducingQueue(this->dispatcher->getConsumingQueue());
 
   // Communicate simulation objects
   // Producer push network messages to the dispatcher queue
-  this->producer->setProducingQueue(this->dispatcher->getConsumingQueue());
+  this->producer->setProducingQueue
+  (this->assembler->getConsumingQueue()); // CHANGE
   // Dispatcher delivers to each consumer, and they should be registered
   for ( size_t index = 0; index < this->consumerCount; ++index ) {
     this->dispatcher->registerRedirect(index + 1
@@ -71,6 +73,7 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
 
   // Start the simulation
   this->producer->startThread();
+  this->assembler->startThread(); // CHANGE
   this->dispatcher->startThread();
   for ( size_t index = 0; index < this->consumerCount; ++index ) {
     this->consumers[index]->startThread();
@@ -78,11 +81,13 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
 
   // Wait for objets to finish the simulation
   this->producer->waitToFinish();
+  this->assembler->waitToFinish();
+  this->assembler->notifyEndToDispatcher(); // CHANGE
   this->dispatcher->waitToFinish();
   for ( size_t index = 0; index < this->consumerCount; ++index ) {
     this->consumers[index]->waitToFinish();
   }
-
+  
   // Simulation finished
   return EXIT_SUCCESS;
 }
