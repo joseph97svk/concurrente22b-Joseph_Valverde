@@ -20,7 +20,6 @@ double packageLossPercentage):
 ConsumerTest(consumerDelay),
 ProducerTest(packageCount, productorDelay, consumerCount),
 packageLossPercentage(packageLossPercentage) {
-  std::cout << this->packageLossPercentage <<std::endl;
 }
 
 int AssemblerTest::run() {
