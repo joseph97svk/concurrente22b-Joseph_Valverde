@@ -49,7 +49,7 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
     this->consumers[index]->createOwnQueue();
   }
 
-  sharedData* sharedPackageCount = new sharedData(this->packageCount, this->consumerCount);
+  sharedData* sharedPackageCount = new sharedData(this->packageCount, this->producerCount);
 
   // Create each producer
   this->producers.resize(this->producerCount);
@@ -96,20 +96,20 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
 
 int ProducerConsumerTest::analyzeArguments(int argc, char* argv[]) {
   // 5 + 1 arguments are mandatory
-  if ( argc < 6 ) {
+  if ( argc < 7 ) {
     std::cout << usage;
     return EXIT_FAILURE;
   }
 
   int index = 1;
   this->packageCount = std::strtoull(argv[index++], nullptr, 10);
+  this->producerCount = std::strtoull(argv[index++], nullptr, 10);
   this->consumerCount = std::strtoull(argv[index++], nullptr, 10);
   this->productorDelay = std::atoi(argv[index++]);
   this->dispatcherDelay = std::atoi(argv[index++]);
   this->consumerDelay = std::atoi(argv[index++]);
-  this->producerCount = this->consumerCount;
 
-  if (argc == 7) {
+  if (argc == 8) {
     this->packageLossPercentage = std::atof(argv[index++]);
   }
 

@@ -10,14 +10,14 @@ class producer: public thread<dataType> {
 
   DISABLE_COPY(producer);
 
-  void process(dataType data) override {
+  void process(dataType data) override {progress on exercise 23
     simulationData* simulationData = (struct simulationData*) data;
 
     while (true) {
       size_t my_unit = 0;
 
       simulationData->can_access_next_unit.lock();
-      if (simulationData->next_unit < simulationData->unit_count) {
+      if (simulationData->next_unit < simulationData->unprogress on exercise 23it_count) {
         my_unit = ++simulationData->next_unit;
       } else {
         simulationData->can_access_next_unit.unlock();

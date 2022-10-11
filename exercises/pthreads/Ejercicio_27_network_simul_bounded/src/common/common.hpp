@@ -1,9 +1,10 @@
 // Copyright 2021 Jeisson Hidalgo-Cespedes. Universidad de Costa Rica. CC BY 4.0
 
-#define MAXQUEUESIZE (100000000)
-
 #ifndef COMMON_HPP
-#define COMMON_HPP
+#define COMMON_HPPs
+#include <climits>
+
+#define MAXQUEUESIZE (SEM_VALUE_MAX)
 
 /// Declare four of the rule-of-the-five methods
 #define DECLARE_RULE4(Class, action) \
