@@ -18,11 +18,15 @@ struct sharedData {
 
   std::mutex canAccessFinishedAmount;
 
- public:
+  std::mutex canAccessDataAmount;
+
+  std::vector<int32_t> hasData;
 
   Semaphore receivedData;
 
-  std::vector<int32_t> hasData;
+  int32_t inQueueAmount = 0;
+
+ public:
 
   sharedData(const size_t packageCount, const size_t producerAmount);
 
@@ -37,4 +41,14 @@ struct sharedData {
   void notifyFinished();
 
   size_t getProducerAmount();
+
+  Semaphore* getReceivedData();
+
+  void increaseHasData(int32_t pos);
+
+  bool checkHasData(int32_t pos);
+
+  void reduceHasData(int32_t pos);
+
+  bool leftInQueue();
 };

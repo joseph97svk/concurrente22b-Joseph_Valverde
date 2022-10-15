@@ -22,18 +22,19 @@ int ProducerTest::run() {
   while (this->getPackageCount() > 0) {
     this->produce(this->createMessage(this->packageCount));
     (this->packagesProduced)++;
-    this->sharedPackageCount->hasData[this->id]++;
-    this->sharedPackageCount->receivedData.signal();
+    this->sharedPackageCount->increaseHasData(this->id);
+    this->sharedPackageCount->getReceivedData()->signal();
   }
 
   this->sharedPackageCount->notifyFinished();
 
-  std::cout << "dony" << std::endl;
+  //std::cout << "dony" << std::endl;
 
   // Produce an empty message to communicate we finished
   if (this->sharedPackageCount->getCanFinish()) {
     this->produce(NetworkMessage());
-    this->sharedPackageCount->receivedData.signal();
+    this->sharedPackageCount->increaseHasData(this->id);
+    this->sharedPackageCount->getReceivedData()->signal();
   }
 
   // Report production is done

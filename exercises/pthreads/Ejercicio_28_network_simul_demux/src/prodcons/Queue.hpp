@@ -27,20 +27,29 @@ class Queue {
 
   Semaphore canProduce;
   /// Indicates if there are consumable elements in the queue
-  Semaphore canConsume;
+  Semaphore* canConsume;
   /// Contains the actual data shared between producer and consumer
   std::queue<DataType> queue;
 
+  bool ownsCanConsume = false;
+
  public:
   /// Constructor
-  Queue(size_t queueCapacity = MAXQUEUESIZE)
+  Queue(size_t queueCapacity = MAXQUEUESIZE, Semaphore* canConsume = nullptr)
     :
     canProduce(queueCapacity),
-    canConsume(0) {
+    canConsume(canConsume) {
+    if (this->canConsume == nullptr) {
+      this->canConsume = new Semaphore(0);
+      this->ownsCanConsume = true;
+    }
   }
 
   /// Destructor
   ~Queue() {
+    if (this->ownsCanConsume) {
+      delete(this->canConsume);
+    }
     // TODO(jhc): clear()?
   }
 
@@ -51,14 +60,14 @@ class Queue {
     this->mutex.lock();
     this->queue.push(data);
     this->mutex.unlock();
-    this->canConsume.signal();
+    this->canConsume->signal();
   }
 
   /// Consumes the next available element. If the queue is empty, blocks the
   /// calling thread until an element is produced and enqueue
   /// @return A copy of the element that was removed from the queue
   DataType pop() {
-    this->canConsume.wait();
+    this->canConsume->wait();
     this->mutex.lock();
     DataType result = this->queue.front();
     this->queue.pop();

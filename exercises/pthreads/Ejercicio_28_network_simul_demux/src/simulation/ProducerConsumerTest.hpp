@@ -10,7 +10,7 @@
 #include <cstdint>
 
 #include "../common/common.hpp"
-#include "Gatherer.hpp"
+#include "Demux.hpp"
 
 // Forward declarations
 class ConsumerTest;
@@ -46,7 +46,7 @@ class ProducerConsumerTest {
   /// A dispatcher of the of the simulated network messages
   DispatcherTest* dispatcher = nullptr;
 
-  Gatherer<NetworkMessage>* gatherer = nullptr;
+  Demux<NetworkMessage>* demux = nullptr;
   /// Consumers of the simulated network messages
   std::vector<ConsumerTest*> consumers;
 

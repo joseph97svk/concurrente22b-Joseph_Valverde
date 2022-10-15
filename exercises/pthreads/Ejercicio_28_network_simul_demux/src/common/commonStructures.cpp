@@ -30,14 +30,48 @@ bool sharedData::getCanFinish() {
 }
 
 void sharedData::notifyFinished() {
-  std::cout << "done" << std::endl;
+  //std::cout << "done" << std::endl;
   this->canAccessFinishedAmount.lock();
     (this->finishedProducedAmount)++;
   this->canAccessFinishedAmount.unlock();
 }
 
-
 size_t sharedData::getProducerAmount() {
   return this->totalProducersAmount;
 }
+
+Semaphore* sharedData::getReceivedData() {
+  return &this->receivedData;
+}
+
+void sharedData::increaseHasData(int32_t pos) {
+  this->canAccessDataAmount.lock();
+    this->hasData[pos]++;
+    this->inQueueAmount++;
+  this->canAccessDataAmount.unlock();
+}
+
+bool sharedData::checkHasData(int32_t pos) {
+  bool ans = false;
+  this->canAccessDataAmount.lock();
+    ans = this->hasData[pos];
+  this->canAccessDataAmount.unlock();
+  return ans;
+}
+
+void sharedData::reduceHasData(int32_t pos) {
+  this->canAccessDataAmount.lock();
+    this->hasData[pos]--;
+    this->inQueueAmount--;
+  this->canAccessDataAmount.unlock();
+}
+
+bool sharedData::leftInQueue() {
+  bool ans = false;
+  this->canAccessDataAmount.lock();
+    ans = this->inQueueAmount == 0;
+  this->canAccessDataAmount.unlock();
+  return ans;
+}
+
 #endif

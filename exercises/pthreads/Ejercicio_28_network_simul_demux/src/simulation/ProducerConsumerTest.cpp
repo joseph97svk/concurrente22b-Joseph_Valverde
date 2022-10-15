@@ -27,7 +27,7 @@ ProducerConsumerTest::~ProducerConsumerTest() {
   for (ProducerTest* producer : this->producers )
     delete producer;
 
-  delete this->gatherer;
+  delete this->demux;
 
   for ( ConsumerTest* consumer : this->consumers )
     delete consumer;
@@ -41,8 +41,8 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
 
   sharedData* sharedPackageCount = new sharedData(this->packageCount, this->producerCount);
 
-  this->gatherer = new Gatherer<NetworkMessage>(sharedPackageCount);
-  this->gatherer->createOwnQueues(this->producerCount);
+  this->demux = new Demux<NetworkMessage>(sharedPackageCount);
+  this->demux->createOwnQueues(this->producerCount);
   // Create each producer
   this->consumers.resize(this->consumerCount);
   // TODO: -1
@@ -60,12 +60,12 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
     , this->consumerCount, sharedPackageCount, index);
     // Communicate simulation objects
     // Producer push network messages to the dispatcher queue
-    this->producers[index]->setProducingQueue(this->gatherer->getProducingQueue(index));
+    this->producers[index]->setProducingQueue(this->demux->getProducingQueue(index));
   }
 
   // Dispatcher delivers to each consumer, and they should be registered
   for ( size_t index = 0; index < this->consumerCount; ++index ) {
-    this->gatherer->registerRedirect(this->consumers[index]->getConsumingQueue());
+    this->demux->registerRedirect(this->consumers[index]->getConsumingQueue());
   }
 
   // Start the simulation
@@ -73,7 +73,7 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
     this->producers[index]->startThread();
   }
 
-  this->gatherer->startThread();
+  this->demux->startThread();
   for ( size_t index = 0; index < this->consumerCount; ++index ) {
     this->consumers[index]->startThread();
   }
@@ -83,11 +83,11 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
     this->producers[index]->waitToFinish();
   }
 
-  std::cout << "producers done" << std::endl;
+  //std::cout << "producers done" << std::endl;
 
-  this->gatherer->waitToFinish();
+  this->demux->waitToFinish();
 
-  std::cout << "gatherer done" << std::endl;
+  //std::cout << "gatherer done" << std::endl;
   for ( size_t index = 0; index < this->consumerCount; ++index ) {
     this->consumers[index]->waitToFinish();
   }
