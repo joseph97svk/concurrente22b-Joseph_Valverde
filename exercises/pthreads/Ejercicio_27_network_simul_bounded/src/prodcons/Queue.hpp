@@ -33,7 +33,7 @@ class Queue {
 
  public:
   /// Constructor
-  Queue(size_t queueCapacity = MAXQUEUESIZE)
+  explicit Queue(size_t queueCapacity = MAXQUEUESIZE)
     :
     canProduce(queueCapacity),
     canConsume(0) {

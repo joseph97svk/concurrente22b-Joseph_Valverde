@@ -1,3 +1,4 @@
+// Copyright 2022 Joseph Valverde <joseph.valverdekong@ucr.ac.cr>
 #include "commonStructures.hpp"
 
 sharedData::sharedData(const size_t packageCount, const size_t producerAmount):
@@ -18,7 +19,7 @@ bool sharedData::getCanFinish() {
   this->canAccessFinishedAmount.lock();
     size_t ans = this->finishedProducedAmount;
   this->canAccessFinishedAmount.unlock();
-  return ans == this->totalProducersAmount; 
+  return ans == this->totalProducersAmount;
 }
 
 void sharedData::notifyFinished() {
