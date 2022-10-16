@@ -1,0 +1,79 @@
+= Tarea03: goldbach_serial = 
+
+== Summary ==
+*Author(s):* Joseph Valverde
+
+:description:  Implementation of the goldbach conjecture in the C programming language.
+:keywords:  prime numbers, weak goldbach conjecture, strong goldbach conjecture
+
+*Description:* {description}
+
+*Keywords:* {keywords}
+
+== Analisis ==
+
+=== Description ===
+
+The objective is to find, according to the goldbach conjecture, the sum of prime numbers that equal to the given number. The goldbach conjecture is made of two distinct conjectures depending on whether the number is even or odd. According to the strong conjecture, for every even number greater than 5, there exists a sum of two prime numbers that equal said given number. According to the weak conjecture, for every odd number greater than 5, there exists a sum of 3 prime numbers that equal said given number. 
+
+In order to find such said numbers, the program will be required to read a list of numbers through the stardard input in the console. These numbers can be either positive, or negative. In the case of the negative ones, these are computed as positive ones, however the sign is considered for the printing of results, as this is considered as a flag to print all the sums found, rather than just the amount of sums found. After all said numbers are given, the program is to compute the sums according to the goldbach conjectures. Finally the results are to be printed on the stardard output on the operating sistem console, where, one the first line the amount of numbers given and total amount of sums computed are given, and on the subsequent lines, the number, amount of sums for this number, and if directed, the sums are printed. 
+
+==== Concurrency ====
+
+As an addition to increase the efficiency in execution time, data concurrency was added to the processing of the numbers according to the goldbach conjectures. There were two main options to parallalelize data: parallelize the search of the prime numbers for each number, or parallelize the numbers.
+
+The approach chosen was the later. The main reason being that in a further release, an optimization to the prime number search will be made, which will be greatly benefited from concurrency. The current model would likely saturate the cores and increase complexity unecessarily. This implementation allows for the prime number parallelization optimazation to be easily added down the line and given a large amount of numbers given, heavily reduce the execution time. This with the caveat that if a small amount of large numbers are given, the improvement in execution time might, either not be dramatic enough, or not change at all. 
+
+=== User Manual ===
+
+==== Execution ====
+""file_location"/Tarea03" or more commonly "bin/Tarea02" depending on the location of the executable.
+
+This release supports multithreading for the processing of numbers, and the amount of threads can be defined by the user on the execution stage. This is done by adding a second parameter to the execution call as in ""file_location"/Tarea03 X" being X the thread amount. Say for the execution of the program in the bin file with 8 threads then the call would be "bin/Tarea03 8". 
+
+If not defined, an only given the parameter to call the program, then the amount of threads will be defined by the amount of logical cores supported by the system. So in a system with 8 physical cores and 16 logical cores (as result of simulteneaus multi-threading) would result in 16 threads being run with a call "bin/Tarea03".
+
+
+==== Input Stage: feeding the numbers ====
+
+At start, the program will read all given input. Each input is separated by a next line, after which the next input considered a different one. If given a next line without a given input, the program will consider the input stage done and will begin processing the numbers given by the user.
+
+==== Allowed inputs ====
+The input is regulated and will only allow numbers up to 2^63-1. It will also only allow integers. Any other type of input will prompt an error message and stop the execution of the program. 
+
+==== Choosing the output type ====
+
+The given numbers can be either positive or negative, these will however always be computed as positive integers.
+
+All output will always print on each line, the number at the given position and the amount of sums found for said given number. For negative numbers, however, the program will print said calculated sums too.
+
+
+=== Credits ===
+
+==== Designed and implemented by: ====
+
+Joseph Stuart Valverde Kong
+
+UCR student in Computación en varios Énfasis, C 18100
+
+*Email:* joseph.valverdekong@ucr.ac.cr
+
+==== Supporting sources: ====
+
+Primality Test (Wikipedia)
+
+*Found in:* https://en.wikipedia.org/wiki/Primality_test 
+
+*Use:*  Finding an mathematical principal that leads to an efficient algorithm capable of determining wether a given integer is prime or not. 
+
+The choosen math principle is dictates that all prime numbers can be represented as 6k +/- 1 and that there is irrelevant and redundant looking for a factor greater than sqrt(n) to determine if a number is prime or not. 
+
+
+== Design ==
+
+Refer to link:design/readme.adoc[DESIGN] for design complete documentation. 
+
+== Report ==
+
+Refer to link:report/readme.adoc[REPORT] for report on results of optimizations
+

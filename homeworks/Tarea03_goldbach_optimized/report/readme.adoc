@@ -1,0 +1,7 @@
+= Report =
+
+== Optimization 1: serial ==
+
+== Optimization 2: serial ==
+
+== Optimization 3: Dinamic Mapping ==
