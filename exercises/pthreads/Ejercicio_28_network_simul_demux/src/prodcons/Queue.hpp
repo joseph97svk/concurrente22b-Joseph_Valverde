@@ -35,7 +35,8 @@ class Queue {
 
  public:
   /// Constructor
-  Queue(size_t queueCapacity = MAXQUEUESIZE, Semaphore* canConsume = nullptr)
+  explicit Queue(size_t queueCapacity = MAXQUEUESIZE,
+  Semaphore* canConsume = nullptr)
     :
     canProduce(queueCapacity),
     canConsume(canConsume) {

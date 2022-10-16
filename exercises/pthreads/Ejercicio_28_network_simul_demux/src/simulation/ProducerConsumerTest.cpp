@@ -39,13 +39,14 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
     return error;
   }
 
-  sharedData* sharedPackageCount = new sharedData(this->packageCount, this->producerCount);
+  sharedData* sharedPackageCount =
+  new sharedData(this->packageCount, this->producerCount);
 
   this->demux = new Demux<NetworkMessage>(sharedPackageCount);
   this->demux->createOwnQueues(this->producerCount);
   // Create each producer
   this->consumers.resize(this->consumerCount);
-  // TODO: -1
+
   for ( size_t index = 0; index < this->consumerCount; ++index ) {
     this->consumers[index] = new ConsumerTest(this->consumerDelay);
     assert(this->consumers[index]);
@@ -60,7 +61,8 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
     , this->consumerCount, sharedPackageCount, index);
     // Communicate simulation objects
     // Producer push network messages to the dispatcher queue
-    this->producers[index]->setProducingQueue(this->demux->getProducingQueue(index));
+    this->producers[index]->setProducingQueue(
+      this->demux->getProducingQueue(index));
   }
 
   // Dispatcher delivers to each consumer, and they should be registered
@@ -83,11 +85,9 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
     this->producers[index]->waitToFinish();
   }
 
-  //std::cout << "producers done" << std::endl;
-
   this->demux->waitToFinish();
 
-  //std::cout << "gatherer done" << std::endl;
+
   for ( size_t index = 0; index < this->consumerCount; ++index ) {
     this->consumers[index]->waitToFinish();
   }

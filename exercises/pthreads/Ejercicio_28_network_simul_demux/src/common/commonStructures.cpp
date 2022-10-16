@@ -1,3 +1,4 @@
+// Copyright 2022 Joseph Valverde <joseph.valverdekong@ucr.ac.cr>
 #ifndef COMMONSTRUCTURES_HPP
 #define COMMONSTRUCTURES_HPP
 
@@ -26,11 +27,10 @@ bool sharedData::getCanFinish() {
   this->canAccessFinishedAmount.lock();
     size_t ans = this->finishedProducedAmount;
   this->canAccessFinishedAmount.unlock();
-  return ans == this->totalProducersAmount; 
+  return ans == this->totalProducersAmount;
 }
 
 void sharedData::notifyFinished() {
-  //std::cout << "done" << std::endl;
   this->canAccessFinishedAmount.lock();
     (this->finishedProducedAmount)++;
   this->canAccessFinishedAmount.unlock();

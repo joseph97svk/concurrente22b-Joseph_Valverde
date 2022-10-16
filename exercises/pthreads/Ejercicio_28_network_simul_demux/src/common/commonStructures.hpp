@@ -1,3 +1,4 @@
+// Copyright 2022 Joseph Valverde <joseph.valverdekong@ucr.ac.cr>
 #include <cstdlib>
 #include <mutex>
 #include <thread>
@@ -27,7 +28,6 @@ struct sharedData {
   int32_t inQueueAmount = 0;
 
  public:
-
   sharedData(const size_t packageCount, const size_t producerAmount);
 
   DISABLE_COPY(sharedData);

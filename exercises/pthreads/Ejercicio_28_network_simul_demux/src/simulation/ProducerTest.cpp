@@ -8,7 +8,7 @@
 #include "../common/commonStructures.hpp"
 
 ProducerTest::ProducerTest(size_t packageCount, int productorDelay
-  , size_t consumerCount, sharedData* sharedPackageCount, 
+  , size_t consumerCount, sharedData* sharedPackageCount,
   size_t id)
   : packageCount(packageCount)
   , productorDelay(productorDelay)
@@ -27,8 +27,6 @@ int ProducerTest::run() {
   }
 
   this->sharedPackageCount->notifyFinished();
-
-  //std::cout << "dony" << std::endl;
 
   // Produce an empty message to communicate we finished
   if (this->sharedPackageCount->getCanFinish()) {
