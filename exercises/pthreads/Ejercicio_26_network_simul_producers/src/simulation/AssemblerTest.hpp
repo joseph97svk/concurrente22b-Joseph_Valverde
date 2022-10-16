@@ -1,3 +1,4 @@
+// Copyright 2022 Joseph Valverde <joseph.valverdekong@ucr.ac.cr>
 #include "ConsumerTest.hpp"
 #include "ProducerTest.hpp"
 #include "NetworkMessage.hpp"
@@ -8,11 +9,11 @@ public ConsumerTest, public ProducerTest {
  protected:
   /// @brief percentage of packages that will be lost
   double packageLossPercentage;
-  
+
   /// @brief  amount of packages lost
   int64_t packagesLost = 0;
 
- public: 
+ public:
   AssemblerTest(
   int consumerDelay = 0,
   size_t packageCount = 0, int productorDelay = 0,

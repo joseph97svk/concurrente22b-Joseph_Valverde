@@ -42,14 +42,15 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
   this->dispatcher->createOwnQueue();
   // Create each producer
   this->consumers.resize(this->consumerCount);
-  // TODO: -1
+
   for ( size_t index = 0; index < this->consumerCount; ++index ) {
     this->consumers[index] = new ConsumerTest(this->consumerDelay);
     assert(this->consumers[index]);
     this->consumers[index]->createOwnQueue();
   }
 
-  sharedData* sharedPackageCount = new sharedData(this->packageCount, this->producerCount);
+  sharedData* sharedPackageCount =
+  new sharedData(this->packageCount, this->producerCount);
 
   // Create each producer
   this->producers.resize(this->producerCount);
@@ -59,7 +60,8 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
     , this->consumerCount, sharedPackageCount);
     // Communicate simulation objects
     // Producer push network messages to the dispatcher queue
-    this->producers[index]->setProducingQueue(this->dispatcher->getConsumingQueue());
+    this->producers[index]->setProducingQueue(
+      this->dispatcher->getConsumingQueue());
   }
 
   // Dispatcher delivers to each consumer, and they should be registered

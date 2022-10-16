@@ -30,7 +30,8 @@ class ProducerTest : public Producer<NetworkMessage> {
 
  public:
   /// Constructor
-  ProducerTest(size_t packageCount, int productorDelay, size_t consumerCount, sharedData* sharedPackageCount);
+  ProducerTest(size_t packageCount, int productorDelay,
+  size_t consumerCount, sharedData* sharedPackageCount);
   /// Do the message production in its own execution thread
   int run() override;
 
