@@ -1,4 +1,4 @@
-= Tarea01: goldbach_serial = 
+= Tarea02: goldbach_serial = 
 
 == Summary ==
 *Author(s):* Joseph Valverde
@@ -27,9 +27,11 @@ The approach chosen was the later. The main reason being that in a further relea
 === User Manual ===
 
 ==== Execution ====
-In order to use the program type on the console:
+""file_location"/Tarea02" or more commonly "bin/Tarea02" depending on the location of the executable.
 
-""file_location"/Tarea01" or more commonly "bin/Tarea01" depending on the location of the executable.
+This release supports multithreading for the processing of numbers, and the amount of threads can be defined by the user on the execution stage. This is done by adding a second parameter to the execution call as in ""file_location"/Tarea02 X" being X the thread amount. Say for the execution of the program in the bin file with 8 threads then the call would be "bin/Tarea02 8". 
+
+If not defined, an only given the parameter to call the program, then the amount of threads will be defined by the amount of logical cores supported by the system. So in a system with 8 physical cores and 16 logical cores (as result of simulteneaus multi-threading) would result in 16 threads being run with a call "bin/Tarea02".
 
 
 ==== Input Stage: feeding the numbers ====
