@@ -44,7 +44,7 @@ class ProducerConsumerTest {
   /// Consumers of the simulated network messages
   std::vector<ConsumerTest*> consumers;
   /// @brief Assembler to be between producer and dispatcher
-  class AssemblerTest* assembler = nullptr; // CHANGE
+  class AssemblerTest* assembler = nullptr;  // CHANGE
 
  public:
   /// Constructor

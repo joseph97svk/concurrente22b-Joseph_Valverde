@@ -1,3 +1,4 @@
+// Copyright 2022 Joseph Valverde <joseph.valverdekong@ucr.ac.cr>
 #include <random>
 
 #include "AssemblerTest.hpp"
@@ -25,7 +26,7 @@ packageLossPercentage(packageLossPercentage) {
 int AssemblerTest::run() {
   this->consumeForever();
 
-  Log::append(Log::INFO, "Assembler:", 
+  Log::append(Log::INFO, "Assembler:",
   std::to_string(this->receivedMessages) + " packages received");
 
   Log::append(Log::INFO, "Assembler:",
