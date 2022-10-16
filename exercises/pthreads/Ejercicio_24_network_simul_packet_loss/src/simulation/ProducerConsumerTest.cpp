@@ -42,21 +42,19 @@ int ProducerConsumerTest::start(int argc, char* argv[]) {
   this->dispatcher->createOwnQueue();
   // Create each producer
   this->consumers.resize(this->consumerCount);
-  // TODO: -1
+
   for ( size_t index = 0; index < this->consumerCount -1; ++index ) {
     this->consumers[index] = new ConsumerTest(this->consumerDelay);
     assert(this->consumers[index]);
     this->consumers[index]->createOwnQueue();
   }
 
-  // TODO: add assembler
   this->consumers[this->consumerCount -1] =
   new AssemblerTest(this->consumerDelay,
   0, 0, this->consumerCount, this->packageLossPercentage);
 
-  // TODO: setProducing Queue for assembler
   this->consumers[this->consumerCount-1]->createOwnQueue();
-  // TODO: set producing queue for assembler
+
   dynamic_cast<ProducerTest*>(this->consumers[this->consumerCount-1])->
   setProducingQueue(this->dispatcher->getConsumingQueue());
 
