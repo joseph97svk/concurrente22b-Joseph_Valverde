@@ -1,3 +1,6 @@
+// Copyright [2022] <Joseph Valverde, Alvaro Arguedas, Carlos Mora>
+#pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>

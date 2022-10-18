@@ -1,3 +1,5 @@
+#pragma once
+
 // Copyright 2022 Joseph Valverde <joseph.valverdekong@ucr.ac.cr>
 #include "Goldbach_arr.h"
 #include <pthread.h>
