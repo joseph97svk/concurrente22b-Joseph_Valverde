@@ -13,12 +13,12 @@
 
 #define CAST(type, unit)\
   (type)(unit)
-  //reinterpret_cast<type>(unit)
+  // reinterpret_cast<type>(unit)
 
 typedef int64_t unit_t;
 
-
-int32_t add_number(goldbach_conjecture_t* goldbach_conjecture, unit_t current_val_read);
+int32_t add_number(goldbach_conjecture_t* goldbach_conjecture,
+unit_t current_val_read);
 
 /**
  * @brief checks if the given input is valid and gives the value
@@ -97,8 +97,15 @@ const unit_t num, bool positive, const int64_t position);
 int32_t goldbach_even_process(goldbach_conjecture_t* goldbach_data,
 const unit_t num, bool positive, const int64_t position);
 
-
-void prime_search_atkins_sieve(goldbach_conjecture_t* goldbach_conjecture);
+/**
+ * @brief finds all prime numbers needed to process all numbers
+ * 
+ * @param goldbach_conjecture where all needed data is found and where it will be stored
+ * @param initPos first position to process
+ * @param finalPos last position to process
+ */
+void prime_search_atkins_sieve(goldbach_conjecture_t* goldbach_conjecture,
+int64_t initPos, int64_t finalPos);
 
 /**
  * @brief Finds the next prime number after the given number
@@ -109,7 +116,8 @@ void prime_search_atkins_sieve(goldbach_conjecture_t* goldbach_conjecture);
  * @return int64_t 
  */
 
-unit_t find_next_prime(const unit_t last_prime, goldbach_conjecture_t* goldbach_conjecture);
+unit_t find_next_prime(const unit_t last_prime,
+goldbach_conjecture_t* goldbach_conjecture);
 
 /**
  * @brief checks if a given number is prime
@@ -236,7 +244,8 @@ int32_t goldbach_read_numbers(goldbach_conjecture_t* goldbach_conjecture) {
   return number_addition_error;
 }
 
-int32_t add_number(goldbach_conjecture_t* goldbach_conjecture, unit_t current_val_read) {
+int32_t add_number(goldbach_conjecture_t* goldbach_conjecture,
+unit_t current_val_read) {
   int32_t number_addition_error =
     goldbach_add_num(goldbach_conjecture->goldbach_arr, current_val_read);
   if (number_addition_error == EXIT_SUCCESS) {
@@ -347,17 +356,21 @@ bool check_all_chars(char string[64], int32_t* minus_found, bool* num_found) {
 int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture) {
   int32_t num_process_error = EXIT_SUCCESS;
 
-  goldbach_conjecture->threads = CAST(pthread_t*,
-  calloc(goldbach_conjecture->thread_amount, sizeof(pthread_t)));
-
-
-  prime_search_atkins_sieve(goldbach_conjecture); 
-
   if (goldbach_conjecture->thread_amount >
   goldbach_get_arr_count(goldbach_conjecture->goldbach_arr)) {
     goldbach_conjecture->thread_amount =
     goldbach_get_arr_count(goldbach_conjecture->goldbach_arr);
   }
+
+  goldbach_conjecture->threads = CAST(pthread_t*,
+  calloc(goldbach_conjecture->thread_amount, sizeof(pthread_t)));
+
+  pthread_mutex_init(&(goldbach_conjecture->can_set_prime_num), NULL);
+  pthread_barrier_init(&(goldbach_conjecture->done_with_primes), NULL,
+  goldbach_conjecture->thread_amount);
+
+  prime_search_atkins_sieve(goldbach_conjecture, 1,
+  goldbach_conjecture->max_value);
 
   goldbach_conjecture->last_processed_position = 0;
 
@@ -387,6 +400,10 @@ int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture) {
   }
 
   free(goldbach_conjecture->threads);
+  free(goldbach_conjecture->prime_number_list);
+
+  pthread_mutex_destroy(&(goldbach_conjecture->can_set_prime_num));
+  pthread_mutex_destroy(&(goldbach_conjecture->can_access_position));
 
   return num_process_error;
 }
@@ -485,7 +502,8 @@ const unit_t number, bool positive, const int64_t position) {
     // for each number less than the number minus the current number by half
     for (unit_t current_second_number = 2;
     current_second_number <= (number - current_number)/2;
-    current_second_number = find_next_prime(current_second_number, goldbach_data)) {
+    current_second_number =
+    find_next_prime(current_second_number, goldbach_data)) {
       /* find a third number (the number minus the current number and 
       the second current number)
       */
@@ -563,7 +581,8 @@ const unit_t number, bool positive, const int64_t position) {
 /**
  * Finds the next prime number after the given number
  */
-unit_t find_next_prime(const unit_t last_prime, goldbach_conjecture_t* goldbach_conjecture) {
+unit_t find_next_prime(const unit_t last_prime,
+goldbach_conjecture_t* goldbach_conjecture) {
   // if even start at next number
   unit_t number = last_prime + 1;
 
@@ -578,12 +597,21 @@ unit_t find_next_prime(const unit_t last_prime, goldbach_conjecture_t* goldbach_
   }
 
   return number;
-} 
+}
 
-void prime_search_atkins_sieve(goldbach_conjecture_t* goldbach_conjecture) {
-  int64_t limit = goldbach_conjecture->max_value/2;
+// finds all prime numbers needed to process all numbers
+void prime_search_atkins_sieve(goldbach_conjecture_t* goldbach_conjecture,
+int64_t initPos, int64_t finalPos) {
+  int64_t limit = finalPos;
   goldbach_conjecture->prime_number_list =
-  calloc(limit, sizeof(bool));
+  calloc(limit + 1, sizeof(bool));
+
+  bool* sieve = goldbach_conjecture->prime_number_list;
+
+  if (sieve == NULL) {
+    goldbach_conjecture->prime_number_list_capacity = 0;
+    return;
+  }
 
   goldbach_conjecture->prime_number_list_capacity = limit;
   if (limit > 2) {
@@ -591,39 +619,39 @@ void prime_search_atkins_sieve(goldbach_conjecture_t* goldbach_conjecture) {
   }
 
   if (limit > 3) {
-    goldbach_conjecture->prime_number_list[3] = true;
+    sieve[3] = true;
   }
 
-  for (int x = 1; x * x <= limit; x++) {
-    for (int y = 1; y * y <= limit; y++) {
-      int n = (4 * x * x) + (y + y);
+  for (int x = initPos; x * x <= limit; x++) {
+    for (int y = initPos; y * y <= limit; y++) {
+      int n = (4 * x * x) + (y * y);
       if (n <= limit &&
       (n % 12 == 1 || n % 12 == 5)) {
-        goldbach_conjecture->prime_number_list[n] ^= true;
+        sieve[n] ^= true;
       }
 
       n = (3 * x * x) + (y * y);
       if (n <= limit && n % 12 == 7) {
-        goldbach_conjecture->prime_number_list[n] ^= true;
+        sieve[n] ^= true;
       }
 
-      n = (3 * x * x) - (y + y);
+      n = (3 * x * x) - (y * y);
       if (x > y && n <= limit &&
       n % 12 == 11) {
-        goldbach_conjecture->prime_number_list[n] ^= true;
-      }
-    }
-    
-    for (int num = 5; num * num <= limit; num++) {
-      if (goldbach_conjecture->prime_number_list[num] == true) {
-        for (int other= num * num; other <= limit; other += (num * num)) {
-          goldbach_conjecture->prime_number_list[num] = false;
-        }
+        sieve[n] ^= true;
       }
     }
   }
 
-
+  for (int num = 5; num * num <= limit; num++) {
+    if (sieve[num]) {
+      for (int other = num * num;
+      other <= limit;
+      other += (num * num)) {
+        sieve[other] = false;
+      }
+    }
+  }
 }
 
 /**
@@ -639,7 +667,7 @@ bool isPrimeNum(const unit_t number, goldbach_conjecture_t* goldbach_data) {
   if (number < goldbach_data->prime_number_list_capacity) {
     return goldbach_data->prime_number_list[number];
   }
-  
+
   // check if number is two or three
   if (number == 2 || number == 3) {
     return true;
@@ -659,7 +687,7 @@ bool isPrimeNum(const unit_t number, goldbach_conjecture_t* goldbach_data) {
   }
 
   // number is prime if reached comparator is less than limit
-  return comparator * comparator > number; 
+  return comparator * comparator > number;
 }
 
 /**

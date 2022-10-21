@@ -15,6 +15,8 @@ typedef struct goldbach_conjecture {
   int32_t thread_amount;
   unit_t last_processed_position;
   pthread_mutex_t can_access_position;
+  pthread_mutex_t can_set_prime_num;
+  pthread_barrier_t done_with_primes;
   unit_t max_value;
   bool* prime_number_list;
   int64_t prime_number_list_capacity;

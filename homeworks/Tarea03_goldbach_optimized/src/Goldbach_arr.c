@@ -8,7 +8,7 @@
 
 #define CAST(type, unit)\
   (type)(unit)
-  //reinterpret_cast<type>(unit)
+  // reinterpret_cast<type>(unit)
 
 typedef int64_t unit_t;
 
