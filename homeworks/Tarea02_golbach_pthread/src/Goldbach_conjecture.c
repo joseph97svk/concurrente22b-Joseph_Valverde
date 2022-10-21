@@ -695,14 +695,3 @@ void goldbach_conjecture_destroy(goldbach_conjecture_t* goldbach_conjecture) {
 
   free(goldbach_conjecture);
 }
-
-bool same(char*h, char*s, int m) {
-
-}
-
-bool has(char* h, int n, char* s, int m){
-  if (n < m) {
-    return false;
-  }
-  return (same(h, s, m)? true : has(h + 1, n - 1, s, m));
-}
