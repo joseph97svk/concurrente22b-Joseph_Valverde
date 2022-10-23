@@ -24,6 +24,10 @@ The goldbach_arr contains a array of goldbach_element(s). The goldbach_arr will 
 image::Thread_mem_tracing.png[]
 Memory representation of the thread management. Main thread spans as many threads as either the amount of numbers in the array, or the amount of threads directed. It will do the least of them. Most of the data is handled by the shared data struct named "goldbach_conjecture" and little on each subroutine itself. Notice how on thread2 as the number does not require processing, will not call an unecessary subroutine. 
 
+== Optimizations ==
+
+For design details on the optimizations please refer to link:report/readme.adoc[REPORT]. 
+
 == Pseudocode ==
 
 === main ===
@@ -39,3 +43,4 @@ include::goldbach_conjecture.pseudo[]
 === goldbach_arr ===
 
 include::goldbach_arr.pseudo[]
+

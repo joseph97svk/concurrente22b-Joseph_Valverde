@@ -24,6 +24,10 @@ As an addition to increase the efficiency in execution time, data concurrency wa
 
 The approach chosen was the later. The main reason being that in a further release, an optimization to the prime number search will be made, which will be greatly benefited from concurrency. The current model would likely saturate the cores and increase complexity unecessarily. This implementation allows for the prime number parallelization optimazation to be easily added down the line and given a large amount of numbers given, heavily reduce the execution time. This with the caveat that if a small amount of large numbers are given, the improvement in execution time might, either not be dramatic enough, or not change at all. 
 
+==== Optimizations ====
+
+Details on opimizations on link:report/readme.adoc[REPORT].
+
 === User Manual ===
 
 ==== Execution ====
