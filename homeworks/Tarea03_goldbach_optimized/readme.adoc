@@ -64,13 +64,21 @@ UCR student in Computación en varios Énfasis, C 18100
 
 ==== Supporting sources: ====
 
-Primality Test (Wikipedia)
+===== Primality Test (Wikipedia) =====
 
 *Found in:* https://en.wikipedia.org/wiki/Primality_test 
 
 *Use:*  Finding an mathematical principal that leads to an efficient algorithm capable of determining wether a given integer is prime or not. 
 
 The choosen math principle is dictates that all prime numbers can be represented as 6k +/- 1 and that there is irrelevant and redundant looking for a factor greater than sqrt(n) to determine if a number is prime or not. 
+
+===== Sieve of Atkin (geeksforgeeks.org) =====
+
+*Found in:* https://www.geeksforgeeks.org/sieve-of-atkin/
+
+
+*Use:* Optimization to speed up the search of prime numbers. The sieve calculates all prime numbers up to a limit given at a O(n) time which greatly decreases the execution time of the program. 
+
 
 
 == Design ==
