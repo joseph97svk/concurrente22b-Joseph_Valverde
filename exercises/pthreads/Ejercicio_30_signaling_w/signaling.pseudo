@@ -1,0 +1,12 @@
+procedure main:
+  declare thread_count := read_integer()
+  semaphores := create_semaphores(thread_count, 0)
+  signal(semaphores[0])
+  create_threads(thread_count, secondary)
+end procedure
+
+procedure secondary:
+  wait(semaphore[thread_num])
+  statement a
+  signal(semaphore[thread_num + 1])
+end procedure
