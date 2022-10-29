@@ -1,0 +1,2 @@
+Ejercicio 59 [ping_pong_perfect]
+Un ejercicio clásico de paso de mensajes es simular un juego de tenis de mesa (ping-pong) entre dos procesos. Uno lanza la bola al otro, quien la recibe y la regresa al primero, y así sucesivamente. Los dos jugadores son incansables y nunca pierden un servicio. Haga que su programa simule este comportamiento. Si su programa es invocado con una cantidad distinta a dos jugadores, debe reportar un mensaje de error y finalizar.

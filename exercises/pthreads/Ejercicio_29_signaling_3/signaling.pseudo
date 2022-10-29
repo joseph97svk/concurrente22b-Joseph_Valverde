@@ -1,6 +1,6 @@
 procedure main:
-  shared a1_ready = create_semaphore(0)
-  shared a2_ready = create_semaphore(0)
+  shared a1_ready := create_semaphore(0)
+  shared a2_ready := create_semaphore(0)
 
   create_thread(thread_a)
   create_thread(thread_b)
