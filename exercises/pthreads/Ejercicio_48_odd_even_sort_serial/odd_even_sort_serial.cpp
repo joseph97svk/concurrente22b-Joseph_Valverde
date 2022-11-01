@@ -1,7 +1,6 @@
 #include <iostream>
 
 double* random_num_generator(int amount);
-double get_random_number();
 void serial_odd_even_sort(double* a, const int n);
 void swap (double* a, double* b);
 void print_numbers(double* numbers, int number_amount);
@@ -26,18 +25,20 @@ int main (int argc, char* argv[]) {
 }
 
 double* random_num_generator(int amount) {
-  size_t lower_limit = 0, upper_limit = 99;
+  size_t upper_limit = 99;
   double* numbers = (double*) calloc(amount, sizeof(double));
   for (int num = 0; num < amount; num++) {
     unsigned int seed = (unsigned int) num;
-    numbers[num] = (double) (rand_r(&seed) % (upper_limit - lower_limit + 1)) + lower_limit;
+    double buffer = (double) rand_r(&seed);
+
+    while (buffer > upper_limit) {
+      buffer /= 2;
+    }
+
+    numbers[num] = buffer;
   }
 
   return numbers;
-}
-
-double get_random_number() {
-  
 }
 
 void serial_odd_even_sort(double* arr, const int n) {
