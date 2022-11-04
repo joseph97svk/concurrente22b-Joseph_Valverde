@@ -1,0 +1,45 @@
+main:
+	Read rows
+	Read columns
+	Read terrain
+	Find the maximum perimeter
+	If maximum perimeter is 0
+		Print impossible
+	Else
+		Print maximum perimeter and its coordinates
+
+Find the maximum perimeter:
+	Create maximum perimeter as 0
+	Create maximum coordinates as (0,0)-(0,0)
+	Repeat concurrently|in parallel (ciclically) top left row for each row of terrain except last one
+		Repeat top left column for each column of terrain except last one
+			Create local perimeter as the result of finding maximum perimeter that can be formed from row and column
+			Critic region:
+				If local perimeter is larger than the maximum perimeter
+					Assign maximum perimeter to the local perimeter
+					Assign maximum coordinates to the local rectangle's coordinates
+
+Find maximum perimeter that can be formed from (top left row, top left column):
+	Create maximum perimeter as 0
+	Create maximum coordinates as (0,0)-(0,0)
+	Repeat bottom right row from top left row + 1 to the last one
+		Repeat bottom right column from top left column + 1 to the last one
+			If can form rectangle from top left cell to bottom right cell
+				Create local perimeter as result of calculate perimeter
+				If local perimeter is larger than the maximum perimeter
+					Assign maximum perimeter to the local perimeter
+					Assign maximum coordinates to the local rectangle's coordinates
+	Return the maximum perimeter as a record of perimeter and coordinates
+
+Can form rectangle from top left cell to bottom right cell:
+	Repeat column from top left column to bottom right column
+		If cell at top row is x or cell at bottom row is x then
+			Return false
+	Repeat row from top left row + 1 to bottom right row - 1
+		If cell at left column is x or cell at right column is x then
+			Return false
+	Return true
+
+Calculate perimeter:
+	Return 2 * (bottom right column - top left column - 1) + 2 * (bottom right row - top left row - 1)
+
