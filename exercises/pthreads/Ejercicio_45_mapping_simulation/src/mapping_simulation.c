@@ -22,9 +22,9 @@ typedef struct private_data {
 } private_data_t;
 
 void read_arguments(int argc, char* argv[], int* worker_amount);
-int read_numbers(int* numbers, int* number_amount);
+int* read_numbers(int* number_amount);
 void* work(void* data);
-void serial_mapping(private_data_t* private_data, int* result);
+int serial_mapping(shared_data_t* shared_data);
 void block_mapping(private_data_t* private_data, int* result);
 void cyclic_mapping(private_data_t* private_data, int* result);
 void dynamic_mapping(private_data_t* private_data, int* result);
@@ -40,13 +40,12 @@ int main(int argc, char* argv[]) {
   read_arguments(argc, argv, &worker_amount);
 
   int number_amount = 0;
-  int* numbers = calloc(20, sizeof(int));
+
+  int* numbers = read_numbers(&number_amount);
 
   if (numbers == NULL) {
     return error;
   }
-
-  error = read_numbers(numbers, &number_amount);
 
   pthread_barrier_t done_with_mapping;
   pthread_barrier_init(&done_with_mapping, NULL, worker_amount);
@@ -63,32 +62,72 @@ int main(int argc, char* argv[]) {
 
   private_data_t* private_data =
   calloc(worker_amount, sizeof(private_data_t));
-  printf("begining to work: %i\n", worker_amount);
-
-  for (int i = 0; i < number_amount; i++) {
-    printf("%i,  ", numbers[i]);
-  }
 
   for (int worker = 0; worker < worker_amount; worker++) {
-    printf("worker %i created\n", worker);
     private_data[worker].shared_data = &shared_data;
     private_data[worker].thread_num = worker;
     pthread_create(&workers[worker], NULL,
     work, (void*) &private_data[worker]);
   }
 
-  for (int worker = 0; worker < worker_amount; worker++) {
-    int* results = NULL;
-    pthread_join(workers[worker], (void*)&results);
+  int** results = calloc(worker_amount, sizeof(int*));
 
-    for (int i = 0; i < 3; i++) {
-      printf("%i ", ((int*)results)[i]);
+  for (int worker = 0; worker < worker_amount; worker++) {
+    pthread_join(workers[worker], (void*)&results[worker]);
+  }
+
+  int previous = serial_mapping(&shared_data);
+
+  printf("%i\t ", previous);
+
+  for (int worker = 0; worker < worker_amount; worker++) {
+    printf("%i\t", worker);
+  }
+
+  printf("Duration\tSpeedUp\t\tEfficiency\n");
+
+  for (int mapping = 0; mapping < 3; ++mapping) {
+    switch (mapping)
+    {
+    case 0:
+      printf("Block \t ");
+      break;
+    case 1:
+      printf("Cyclic \t ");
+      break;
+    case 2:
+      printf("Dynamic \t ");
+      break;
     }
+
+    int duration = 0;
+    for (int worker = 0; worker < worker_amount; worker++) {
+      printf("%i\t", results[worker][mapping]);
+      if (results[worker][mapping] > duration) {
+        duration = results[worker][mapping];
+      }
+    }
+
+    double speedup = previous/duration, 
+    efficiency = speedup/worker_amount;
+
+    printf("%i\t\t", duration);
+    printf("%f\t", speedup);
+    printf("%f\t", efficiency);
+
 
     printf("\n");
   }
 
+  for (int worker = 0; worker < worker_amount; worker++) {
+    free(results[worker]);
+  }
+
+  free(results);
+
   free_resources(numbers);
+  free(private_data);
+  free(workers);
 
   return error;
 }
@@ -99,33 +138,37 @@ void read_arguments(int argc, char* argv[], int* worker_amount) {
   }
 }
 
-int read_numbers(int* numbers, int* number_amount) {
-  int error = EXIT_SUCCESS;
+int* read_numbers(int* number_amount) {
+  int* numbers = calloc(20, sizeof(int));
   int capacity = 20;
+  int number_amount_local = 0;
 
-  while (scanf("%i", &numbers[*number_amount]) != 0) {
-    (*number_amount)++;
+  while (scanf("%i", &numbers[number_amount_local]) != 0) {
+    number_amount_local++;
 
-    if (*number_amount == capacity) {
-      capacity += 10;
+    if (number_amount_local == capacity) {
+      capacity *= 10;
       int* temp = realloc(numbers, capacity * sizeof(int));
       if (temp == NULL) {
-        error = 50;
+        return NULL;
       } else {
         numbers = temp;
       }
     }
   }
 
-  int* temp = realloc(numbers, *number_amount * sizeof(int));
+
+  int* temp = realloc(numbers, number_amount_local * sizeof(int));
 
   if (temp == NULL) {
-    error = 50;
+    return NULL;
   } else {
     numbers = temp;
   }
 
-  return error;
+  *number_amount = number_amount_local;
+
+  return numbers;
 }
 
 int get_start_pos(const int i, const int d, const int w) {
@@ -148,17 +191,17 @@ void* work(void* data) {
   // dynamic mapping
   dynamic_mapping(private_data, results);
 
-  printf("<%i, %i, %i>\n", results[0], results[1], results[2]);
-
   return (void*) (size_t)results;
 }
 
-void serial_mapping(private_data_t* private_data, int* result) {
+int serial_mapping(shared_data_t* shared_data) {
+  int result = 0;
   for (int position = 0;
-  position < private_data->shared_data->data_amount;
+  position < shared_data->data_amount;
   ++position) {
-    (*result)++;
+    result++;
   }
+  return result;
 }
 
 void block_mapping(private_data_t* private_data, int* result) {
@@ -179,8 +222,8 @@ void block_mapping(private_data_t* private_data, int* result) {
 
 void cyclic_mapping(private_data_t* private_data, int* result) {
   for (int position = private_data->thread_num;
-  position < private_data->shared_data->data_amount;
-  position += private_data->shared_data->worker_amount) {
+      position < private_data->shared_data->data_amount;
+      position += private_data->shared_data->worker_amount) {
     result[1] += process_data(private_data, position);
   } 
   
@@ -202,14 +245,12 @@ void dynamic_mapping(private_data_t* private_data, int* result) {
 
 int process_data(private_data_t* private_data, const int pos) {
   int time_taken = private_data->shared_data->numbers[pos];
-
-  printf("%i, %i\n", pos, time_taken);
-  //usleep(time_taken);
+  usleep(time_taken);
   return time_taken;
 }
 
 void free_resources(int* numbers) {
   if (numbers != NULL) {
-    //free(numbers);
+    free(numbers);
   }
 }

@@ -2,9 +2,11 @@
 #include <omp.h>
 
 double* random_num_generator(int amount);
-void odd_even_sort(double* a, const int n);
+void serial_odd_even_sort(double* a, const int n);
 void swap (double* a, double* b);
 void print_numbers(double* numbers, int number_amount);
+
+//#define value 
 
 int main (int argc, char* argv[]) {
   int number_amount = 0;
@@ -18,17 +20,29 @@ int main (int argc, char* argv[]) {
     thread_amount = atoi(argv[2]);
   }
 
-  double* numbers = random_num_generator(number_amount);
+  double* numbers = NULL;
 
+  #ifndef value
+  numbers = random_num_generator(number_amount);
+  #endif
   //print_numbers(numbers, number_amount);
-  std::cout << thread_amount << std::endl;
+  std::cout << thread_amount;
 
-  /*#pragma omp parallel num_threads(thread_amount) \
-    default(none) shared(numbers, number_amount, std::cout)  */
+  #pragma omp parallel num_threads(thread_amount) \
+    default(none) shared(numbers, number_amount, std::cout)  
+  {
 
-  std::cout << omp_get_thread_num() << "::" << omp_get_num_threads() << std::endl;
-  odd_even_sort(numbers, number_amount);
+    #ifdef value 
+    numbers = random_num_generator(number_amount);
+    #endif
+    #pragma omp critical(stdout)
+    {
+    std::cout << omp_get_thread_num() << "::" << omp_get_num_threads() << std::endl;
+    }
+    serial_odd_even_sort(numbers, number_amount);
+  }
   
+
   std::cout << "ordered" << std::endl;
 
   print_numbers(numbers, number_amount);
@@ -39,6 +53,10 @@ int main (int argc, char* argv[]) {
 double* random_num_generator(int amount) {
   size_t upper_limit = 99;
   double* numbers = (double*) calloc(amount, sizeof(double));
+
+  #ifdef value
+  #pragma omp for
+  #endif
   for (int num = 0; num < amount; num++) {
     unsigned int seed = (unsigned int) num;
     double buffer = (double) rand_r(&seed);
@@ -53,10 +71,8 @@ double* random_num_generator(int amount) {
   return numbers;
 }
 
-void odd_even_sort(double* a, const int n, int thread_amount) {
-  #pragma omp parallel for num_threads(thread_amount) \
-    default(none) shared(a, n, std::cout)
-
+void serial_odd_even_sort(double* a, const int n) {
+  #pragma omp for
   for (int phase = 0; phase < n; ++phase) {
     if (phase % 2 == 0) {
       for (int i = 1; i < n; i += 2) {
