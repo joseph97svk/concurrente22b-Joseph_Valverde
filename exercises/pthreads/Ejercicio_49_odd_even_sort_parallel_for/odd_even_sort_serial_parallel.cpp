@@ -2,9 +2,10 @@
 #include <omp.h>
 
 double* random_num_generator(int amount);
-void odd_even_sort(double* a, const int n);
+void odd_even_sort(double* a, const int n, int thread_amount);
 void swap (double* a, double* b);
 void print_numbers(double* numbers, int number_amount);
+bool correctness_check(double* numbers, int number_amount);
 
 int main (int argc, char* argv[]) {
   int number_amount = 0;
@@ -20,18 +21,17 @@ int main (int argc, char* argv[]) {
 
   double* numbers = random_num_generator(number_amount);
 
-  //print_numbers(numbers, number_amount);
   std::cout << thread_amount << std::endl;
-
-  /*#pragma omp parallel num_threads(thread_amount) \
-    default(none) shared(numbers, number_amount, std::cout)  */
-
-  std::cout << omp_get_thread_num() << "::" << omp_get_num_threads() << std::endl;
-  odd_even_sort(numbers, number_amount);
   
+  odd_even_sort(numbers, number_amount, thread_amount);
+
   std::cout << "ordered" << std::endl;
 
   print_numbers(numbers, number_amount);
+
+  std::cout <<
+  (correctness_check(numbers, number_amount)? "All in order" : "Not in order")
+  << std::endl;
 
   free (numbers);
 }
@@ -39,6 +39,7 @@ int main (int argc, char* argv[]) {
 double* random_num_generator(int amount) {
   size_t upper_limit = 99;
   double* numbers = (double*) calloc(amount, sizeof(double));
+
   for (int num = 0; num < amount; num++) {
     unsigned int seed = (unsigned int) num;
     double buffer = (double) rand_r(&seed);
@@ -54,17 +55,18 @@ double* random_num_generator(int amount) {
 }
 
 void odd_even_sort(double* a, const int n, int thread_amount) {
-  #pragma omp parallel for num_threads(thread_amount) \
-    default(none) shared(a, n, std::cout)
-
   for (int phase = 0; phase < n; ++phase) {
     if (phase % 2 == 0) {
+      #pragma omp parallel for num_threads(thread_amount) \
+      default(none) shared(a, n, std::cout) 
       for (int i = 1; i < n; i += 2) {
         if (a[i - 1] > a[i]) {
           swap(&a[i - 1], &a[i]);
         }
       }
     } else {
+      #pragma omp parallel for num_threads(thread_amount) \
+      default(none) shared(a, n, std::cout) 
       for (int i = 1; i < n - 1; i += 2) {
         if (a[i] > a[i + 1]) {
           swap(&a[i], &a[i + 1]);
@@ -85,4 +87,14 @@ void print_numbers(double* numbers, int number_amount) {
   for (int num = 0; num < number_amount; ++num) {
     std::cout << numbers[num] << std::endl;
   }
+}
+
+bool correctness_check(double* numbers, int number_amount) {
+  for (int number = 1; number < number_amount; number++) {
+    if (numbers[number - 1] > numbers[number]) {
+      return false;
+    }
+  }
+
+  return true;
 }
