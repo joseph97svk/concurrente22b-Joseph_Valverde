@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <omp.h>
 
 typedef struct
 {
@@ -153,28 +154,33 @@ coordinate_t find_maximum_local_perimeter(const size_t top_left_row, const size_
 	// Create local maximum coordinates as (0,0)-(0,0)
 	coordinate_t local_maximum_coordinates = {0, 0};
 
-	// Repeat bottom right row from top left row + 1 to the last one
-	for ( size_t bottom_right_row = top_left_row + 1; bottom_right_row < fence_data->rows; ++bottom_right_row )
-	{
-		// Repeat bottom right column from top left column + 1 to the last one
-		for ( size_t bottom_right_column = top_left_column + 1; bottom_right_column < fence_data->columns; ++bottom_right_column )
-		{
-			// If can form rectangle from top left cell to bottom right cell
-			if ( can_form_rectangle(top_left_row, top_left_column, bottom_right_row, bottom_right_column, fence_data) )
-			{
-				// Create local perimeter as result of calculate perimeter
-				size_t perimeter = calculate_perimeter((coordinate_t){top_left_row, top_left_column}, (coordinate_t){bottom_right_row, bottom_right_column});
-				// If local perimeter is larger than the maximum perimeter
-				if ( perimeter > local_maximum_perimeter )
-				{
-					// Assign maximum perimeter to the local perimeter
-					local_maximum_perimeter = perimeter;
-					// Assign maximum coordinates to the local rectangle's coordinates
-					local_maximum_coordinates = (coordinate_t){bottom_right_row, bottom_right_column};
-				}
-			}
-		}
-	}
+  #pragma omp parallel num_threads(thread_amount) \
+      default(none) shared(top_left_row, top_left_column, fence_data, local_maximum_perimeter, local_maximum_coordinates) 
+  {
+    // Repeat bottom right row from top left row + 1 to the last one
+    #pragma omp for
+    for ( size_t bottom_right_row = top_left_row + 1; bottom_right_row < fence_data->rows; ++bottom_right_row )
+    {
+      // Repeat bottom right column from top left column + 1 to the last one
+      for ( size_t bottom_right_column = top_left_column + 1; bottom_right_column < fence_data->columns; ++bottom_right_column )
+      {
+        // If can form rectangle from top left cell to bottom right cell
+        if ( can_form_rectangle(top_left_row, top_left_column, bottom_right_row, bottom_right_column, fence_data) )
+        {
+          // Create local perimeter as result of calculate perimeter
+          size_t perimeter = calculate_perimeter((coordinate_t){top_left_row, top_left_column}, (coordinate_t){bottom_right_row, bottom_right_column});
+          // If local perimeter is larger than the maximum perimeter
+          if ( perimeter > local_maximum_perimeter )
+          {
+            // Assign maximum perimeter to the local perimeter
+            local_maximum_perimeter = perimeter;
+            // Assign maximum coordinates to the local rectangle's coordinates
+            local_maximum_coordinates = (coordinate_t){bottom_right_row, bottom_right_column};
+          }
+        }
+      }
+    }
+  }
 
 	// Return the maximum perimeter as a record of perimeter and coordinates
 	return local_maximum_coordinates;
