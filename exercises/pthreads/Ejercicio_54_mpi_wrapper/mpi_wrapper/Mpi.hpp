@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <mpi.h>
 
-//template <typename dataType = int>
+template <typename dataType = int>
 class Mpi {
 
   int processNumber = -1;
