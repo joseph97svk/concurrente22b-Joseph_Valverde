@@ -54,7 +54,19 @@ bool check_first_char(char string[64], int32_t* minus_found, bool* num_found);
  */
 bool check_all_chars(char string[64], int32_t* minus_found, bool* num_found);
 
+/**
+ * @brief processess numbers with mpi processes
+ * 
+ * @param goldbach_conjecture 
+ */
+void mpi_process_nums(goldbach_conjecture_t* goldbach_conjecture);
 
+/**
+ * @brief processes numbers with threads
+ * 
+ * @param goldbach_conjecture 
+ * @return int32_t 
+ */
 int32_t run_threads(goldbach_conjecture_t* goldbach_conjecture);
 
 /**
@@ -351,34 +363,84 @@ bool check_all_chars(char string[64], int32_t* minus_found, bool* num_found) {
  */
 int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture) {
   int32_t num_process_error = EXIT_SUCCESS;
+
+  prime_search_atkins_sieve(goldbach_conjecture, 1,
+  goldbach_conjecture->max_value);
   
   if (MPI_Init(goldbach_conjecture->argc, goldbach_conjecture->argv)
       == MPI_SUCCESS) {
-    int rank = 0, size = 0;
-
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-    printf("Process %i, out of %i\n", rank, size);
-
-    if (goldbach_conjecture->thread_amount >
-        goldbach_get_arr_count(goldbach_conjecture->goldbach_arr)) {
-      goldbach_conjecture->thread_amount =
-      goldbach_get_arr_count(goldbach_conjecture->goldbach_arr);
-    }
-
-    prime_search_atkins_sieve(goldbach_conjecture, 1,
-    goldbach_conjecture->max_value);
-
-    num_process_error = run_threads(goldbach_conjecture);
-    
-    free(goldbach_conjecture->prime_number_list);
+    mpi_process_nums(goldbach_conjecture);
   } else {
     num_process_error = EXIT_FAILURE;
   }
 
   return num_process_error;
+}
+
+void mpi_process_nums(goldbach_conjecture_t* goldbach_conjecture) {
+  int rank = 0, size = 0;
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+  printf("Process %i, out of %i\n", rank, size);
+
+  // if not rank 0 (all other processes)
+  if (rank != 0){ 
+    // send ready
+    MPI_send(&rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+
+    // receive number
+    int number = 0;
+
+    MPI_Recv(&number, 1,
+    MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+    // receive primer numbers
+
+
+    // process data
+
+
+    // send data
+
+
+  // for process 0
+  } else {
+    int rank_to_send = 0;
+
+    int current_number = 0;
+    // receive ready
+    MPI_Recv(&rank_to_send, 1,
+    MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+    // send number
+    MPI_send(&rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+    current_number++;
+
+    // if no more numbers
+    if (current_number >= goldbach_get_arr_count(goldbach_conjecture->goldbach_arr)) {
+      // finalize
+      MPI_Finalize();
+    }
+
+    // send prime numbers
+
+    // receive data
+
+    // store data
+  }
+
+  if (goldbach_conjecture->thread_amount >
+      goldbach_get_arr_count(goldbach_conjecture->goldbach_arr)) {
+    goldbach_conjecture->thread_amount =
+    goldbach_get_arr_count(goldbach_conjecture->goldbach_arr);
+  }
+
+  num_process_error = run_threads(goldbach_conjecture);
+  
+  free(goldbach_conjecture->prime_number_list);
 }
 
 int32_t run_threads(goldbach_conjecture_t* goldbach_conjecture) {
