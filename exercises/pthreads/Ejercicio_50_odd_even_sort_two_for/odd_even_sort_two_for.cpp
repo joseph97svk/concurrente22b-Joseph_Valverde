@@ -1,5 +1,6 @@
 #include <iostream>
 #include <omp.h>
+#include <algorithm>
 
 double* random_num_generator(int amount);
 void serial_odd_even_sort(double* a, const int n);
@@ -74,14 +75,16 @@ void serial_odd_even_sort(double* a, const int n) {
       #pragma omp for
       for (int i = 1; i < n; i += 2) {
         if (a[i - 1] > a[i]) {
-          swap(&a[i - 1], &a[i]);
+          #pragma omp critical(canAccessArr)
+          std::swap(a[i - 1], a[i]);
         }
       }
     } else {
       #pragma omp for
       for (int i = 1; i < n - 1; i += 2) {
         if (a[i] > a[i + 1]) {
-          swap(&a[i], &a[i + 1]);
+          #pragma omp critical(canAccessArr)
+          std::swap(a[i], a[i + 1]);
         }
       }
     }

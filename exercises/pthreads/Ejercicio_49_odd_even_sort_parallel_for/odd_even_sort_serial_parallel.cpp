@@ -61,6 +61,7 @@ void odd_even_sort(double* a, const int n, int thread_amount) {
       default(none) shared(a, n, std::cout) 
       for (int i = 1; i < n; i += 2) {
         if (a[i - 1] > a[i]) {
+          #pragma omp critical(canAccessArr)
           swap(&a[i - 1], &a[i]);
         }
       }
@@ -69,6 +70,7 @@ void odd_even_sort(double* a, const int n, int thread_amount) {
       default(none) shared(a, n, std::cout) 
       for (int i = 1; i < n - 1; i += 2) {
         if (a[i] > a[i + 1]) {
+          #pragma omp critical(canAccessArr)
           swap(&a[i], &a[i + 1]);
         }
       }
