@@ -1,0 +1,134 @@
+goldbach_read_numbers()
+
+    while there is an input
+       if it is next line
+            return
+        
+        validity_check(input)
+        if validity_check is true
+            add number to goldbach_arr
+        else 
+            return invalid input error
+        clean the input variable for next input
+
+
+validity_check()
+
+    if the first char is not a number
+        if the first char is not num, and also not a minus
+            return false
+        else if size is 1
+            return false
+        
+    for all chars in the input
+        if a char is not a number
+            return false
+        
+    convert the input to a num
+    if there is an error
+        return false
+    set value
+    return true
+
+
+goldbach_process_sums()
+    allocate memory for threads
+    
+    last_access_position := 0
+
+    init_mutex(can_access_position)
+
+    for all numbers in goldbach_arr
+        create_thread(threads[number], goldbach_process_num())
+
+    for all numbers in goldbach_arr
+        join_thread(threads[number])
+
+goldbach_process_num()
+  while (true)
+    mutex_lock(can_access_position)
+      position = last_access_position
+      last_access_position++
+    mutex_unlock(can_access_position)
+
+    if (position >= goldbach_get_arr_count())
+      break
+    
+    process_goldbach_num()
+  
+  end while
+   
+
+process_goldbach_num()
+   if less than 0
+        make it positive
+    
+    if less than 6
+        exit process //no need to do anything
+    
+    if even
+        goldbach_even_process()
+    else   
+        goldbach_odd_process()
+
+goldbach_even_process()
+
+    for all find_next_prime() begining in 2, until the number/2
+        other_number := number - current_number 
+        if is_prime_num(other_number)
+            add it to goldbach_arr
+
+
+goldbach_odd_process()
+
+    for all find_next_prime() begining in 2, until the number/2 {
+        var current_number
+        for all find_next_prime() in 2, until the (number - current number)/2 {
+            var current_second_number
+            third_number := number - (current_second_number + current_number)
+            if is_prime_num(third_number) and within restrictions
+                add it to goldbach_arr
+        }
+    }
+
+
+find_next_prime()
+
+    if number is even
+        number += 1
+    else 
+        number += 2
+    
+    while not is_prime_num(number)
+        number += 2
+    return number
+
+
+is_prime_num()
+
+    var comaprator := 5
+    if number is two or three
+        return true
+    if number is 1, even or divisible by 3
+        return false
+    
+    while number is not divisible by comparator and 
+    number is not divisible by comaprator + 2 and
+    comparator^2 is less or equal to number
+        comparator +=  6
+    
+    return if comparator^2 is greater than number
+
+
+goldbach_print_sums()
+
+    print totals 
+    
+    for each number in a goldbach_arr
+        if there are no sums for a given number
+            print NA
+        otherwise 
+            print amount of sums
+        if a number is less than 0
+            print all sums
+
