@@ -25,7 +25,7 @@ typedef struct goldbach_conjecture goldbach_conjecture_t;
  * @param argv arguments
  * @return goldbach_arr_t* 
  */
-goldbach_conjecture_t* goldbach_set_up(int* argc, char*** argv);
+goldbach_conjecture_t* goldbach_set_up(int argc, char** argv);
 
 /**
  * @brief reads the input to the console and adds them to the 
@@ -47,6 +47,14 @@ int32_t goldbach_read_numbers(goldbach_conjecture_t* goldbach_conjecture);
  * @return int32_t error-success state
  */
 int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture);
+
+/**
+ * @brief processess sums for goldbach with mpi
+ * @details for use for mpi ranks other than 0
+ * Do not run for rank 0, will lead to undefined behaviour
+ * @param rank process rank
+ */
+void goldbach_mpi_process(int rank);
 
 /**
  * @brief Prints the results after processing the solutions

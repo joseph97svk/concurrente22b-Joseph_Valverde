@@ -29,6 +29,6 @@ struct goldbach_arr {
   int64_t count;  // amount of contents
   int64_t total_sums_amount;  // sums between all elements in arr
   void* elements;  // the elements with their numbers
-
+  int64_t max_value;
   pthread_mutex_t can_access_array;
 };

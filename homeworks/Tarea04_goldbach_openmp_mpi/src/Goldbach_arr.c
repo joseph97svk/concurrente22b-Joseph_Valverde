@@ -130,6 +130,16 @@ int32_t goldbach_add_num(goldbach_arr_t* arr, const unit_t num) {
     ((arr -> capacity)) * sizeof (goldbach_element_t)));
   }
 
+  int64_t current_val_read = num;
+
+  if (current_val_read < 0) {
+    current_val_read *= -1;
+  }
+
+  if (arr->max_value < current_val_read) {
+    arr->max_value = current_val_read;
+  }
+
   // if everything failed with memory allocation
   if (arr -> elements == NULL) {
     // erase all done and report failure
@@ -446,3 +456,9 @@ void goldbach_arr_destroy(goldbach_arr_t* arr) {
       free(arr);
   }
 }
+
+// returns max value of array
+int64_t goldbach_arr_get_max_value(goldbach_arr_t* arr) {
+  return arr->max_value;
+}
+

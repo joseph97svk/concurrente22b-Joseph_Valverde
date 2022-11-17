@@ -133,3 +133,10 @@ const int64_t num_position, const int64_t sum_position);
  */
 void goldbach_arr_destroy(goldbach_arr_t* arr);
 
+/**
+ * @brief returns the max value in the goldbach arr
+ * 
+ * @param arr @see goldbach_arr
+ * @return int64_t 
+ */
+int64_t goldbach_arr_get_max_value(goldbach_arr_t* arr);

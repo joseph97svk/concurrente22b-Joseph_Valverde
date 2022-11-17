@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <mpi.h>
 
 #include "Goldbach_conjecture.h"
 
@@ -17,48 +18,58 @@ int process_goldbach_nums(goldbach_conjecture_t* goldbach_conjecture);
 int main(int argc, char* argv[]) {
   int32_t goldbach_error = EXIT_SUCCESS;
 
-  // declare goldbach_arr
-  goldbach_conjecture_t* goldbach_conjecture = goldbach_set_up(&argc, &argv);
-
-  if (goldbach_conjecture == NULL) {
-    fprintf(stderr, "error: Goldbach_arr memory could not be allocated\n");
+  // Initiate mpi connection environment
+  if (MPI_Init(&argc, &argv) != MPI_SUCCESS) {
     return EXIT_FAILURE;
   }
 
-  // read values into it
-  goldbach_error = goldbach_read_numbers(goldbach_conjecture);
+  int rank = 0;
 
-  // check if reading numbers was successful
-  switch (goldbach_error) {
-    // if successfull
-    case EXIT_SUCCESS:
-      // process the sums for read numbers
-      goldbach_error = process_goldbach_nums(goldbach_conjecture);
-      break;
-    // otherwise:
-    case error_invalid_input_given:
-      fprintf(stderr, "error: Invalid value read\n");
-      break;
-    case error_goldbach_arr_elements_memory_allocation_failure:
-      fprintf(stderr,
-      "error: Memory could not be allocated to add number\n");
-      break;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  if (rank == 0) {
+    // declare goldbach_arr
+    goldbach_conjecture_t* goldbach_conjecture = goldbach_set_up(argc, argv);
+
+    if (goldbach_conjecture == NULL) {
+      fprintf(stderr, "error: Goldbach_arr memory could not be allocated\n");
+      return EXIT_FAILURE;
+    }
+
+    // read values into it
+    goldbach_error = goldbach_read_numbers(goldbach_conjecture);
+
+    // check if reading numbers was successful
+    switch (goldbach_error) {
+      // if successfull
+      case EXIT_SUCCESS:
+        // process the sums for read numbers
+        goldbach_error = process_goldbach_nums(goldbach_conjecture);
+        break;
+      // otherwise:
+      case error_invalid_input_given:
+        fprintf(stderr, "error: Invalid value read\n");
+        break;
+      case error_goldbach_arr_elements_memory_allocation_failure:
+        fprintf(stderr,
+        "error: Memory could not be allocated to add number\n");
+        break;
+    }
+    if (goldbach_conjecture !=  NULL) {
+      goldbach_conjecture_destroy(goldbach_conjecture);
+    }
+
+  } else {
+    // run non 0 rank processes
+    goldbach_mpi_process(rank);
   }
 
-  // if processing values was successful
-  if (goldbach_error == EXIT_SUCCESS) {
-    // print the results
-    goldbach_print_sums(goldbach_conjecture);
-  }
-
-  if (goldbach_conjecture !=  NULL) {
-    goldbach_conjecture_destroy(goldbach_conjecture);
-  }
-
+  // finalize connection to MPI
+  MPI_Finalize();
   return goldbach_error;
 }
 
-
+// processes values in goldbach_arr
 int process_goldbach_nums(goldbach_conjecture_t* goldbach_conjecture) {
   // process the values in the goldbach_arr
   int32_t goldbach_num_process_error =

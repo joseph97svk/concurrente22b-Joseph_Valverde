@@ -17,6 +17,9 @@
   (type)(unit)
   // reinterpret_cast<type>(unit)
 
+#define MIN(a, b)\
+  (a < b)? a : b
+
 typedef int64_t unit_t;
 
 int32_t add_number(goldbach_conjecture_t* goldbach_conjecture,
@@ -59,7 +62,42 @@ bool check_all_chars(char string[64], int32_t* minus_found, bool* num_found);
  * 
  * @param goldbach_conjecture 
  */
-void mpi_process_nums(goldbach_conjecture_t* goldbach_conjecture);
+void mpi_process_nums(int32_t number_amount,
+int64_t* numbers, int32_t thread_amount);
+
+/**
+ * @brief runs processing of goldbach conjecture numbers with
+ * mpi processes with rank 0
+ * @details this process acts as main process and coordinator
+ * Will also be the one running for default cases and for 1 process amount
+ * @param size amount of mpi processes
+ * @param number_amount amount of numbers
+ * @param numbers the numbers to be processed
+ * @param thread_amount amount of threads expected for execution
+ */
+void mpi_rank_0(int size, int number_amount,
+int64_t* numbers, int32_t thread_amount);
+
+/**
+ * @brief runs processing of goldbach conjecture numbers
+ * for all processes with rank other than 0
+ * 
+ * @param rank rank or id of process
+ * @param size amount of mpi processes for program
+ * @param thread_amount amount of threads expected for execution
+ */
+void mpi_rank_other(int rank, int size, int32_t thread_amount);
+
+/**
+ * @brief Runs the processing of goldbach numbers for non 0 rank processes
+ * 
+ * @param data struct with necessary data for processing
+ * @param number_amount amount of numbers
+ * @param numbers number to be processed
+ * @param thread_amount amount of threads expected for execution
+ */
+void mpi_goldbach_process(goldbach_data_t* data,
+    int number_amount, int64_t* numbers, int32_t thread_amount);
 
 /**
  * @brief processes numbers with threads
@@ -67,7 +105,8 @@ void mpi_process_nums(goldbach_conjecture_t* goldbach_conjecture);
  * @param goldbach_conjecture 
  * @return int32_t 
  */
-int32_t run_threads(goldbach_conjecture_t* goldbach_conjecture);
+int32_t run_threads(goldbach_data_t* goldbach_conjecture,
+int32_t thread_amount, int32_t number_amount);
 
 /**
  * @brief Processes operations to determine goldbach sums
@@ -76,7 +115,7 @@ int32_t run_threads(goldbach_conjecture_t* goldbach_conjecture);
  * @param position 
  * @return int32_t 
  */
-int32_t num_golbach_process(goldbach_conjecture_t* goldbach_data,
+int32_t num_golbach_process(goldbach_data_t* goldbach_data,
 const int64_t position);
 
 /**
@@ -88,7 +127,7 @@ const int64_t position);
  * @return int32_t 
  */
 
-int32_t goldbach_odd_process(goldbach_conjecture_t* goldbach_data,
+int32_t goldbach_odd_process(goldbach_data_t* goldbach_data,
 const unit_t num, bool positive, const int64_t position);
 
 /**
@@ -100,7 +139,7 @@ const unit_t num, bool positive, const int64_t position);
  * @return int32_t 
  */
 
-int32_t goldbach_even_process(goldbach_conjecture_t* goldbach_data,
+int32_t goldbach_even_process(goldbach_data_t* goldbach_data,
 const unit_t num, bool positive, const int64_t position);
 
 /**
@@ -110,7 +149,7 @@ const unit_t num, bool positive, const int64_t position);
  * @param initPos first position to process
  * @param finalPos last position to process
  */
-void prime_search_atkins_sieve(goldbach_conjecture_t* goldbach_conjecture,
+void prime_search_atkins_sieve(goldbach_data_t* goldbach_conjecture,
 int64_t initPos, int64_t finalPos);
 
 /**
@@ -123,7 +162,7 @@ int64_t initPos, int64_t finalPos);
  */
 
 unit_t find_next_prime(const unit_t last_prime,
-goldbach_conjecture_t* goldbach_conjecture);
+goldbach_data_t* goldbach_conjecture);
 
 /**
  * @brief checks if a given number is prime
@@ -137,7 +176,14 @@ goldbach_conjecture_t* goldbach_conjecture);
  * @return false if the number is not prime
  */
 
-bool isPrimeNum(const unit_t number, goldbach_conjecture_t* goldbach_data);
+bool isPrimeNum(const unit_t number, goldbach_data_t* goldbach_data);
+
+/**
+ * @brief prints sums for mpi functions
+ * 
+ * @param goldbach_conjecture 
+ */
+void mpi_print_sums(goldbach_data_t* goldbach_conjecture);
 
 /**
  * @brief Prints the amount of sums found for a given number
@@ -163,6 +209,24 @@ void print_sums_for_num(goldbach_arr_t* goldbach_arr,
 const int64_t sum_amount, unit_t* current_sum,
 int64_t* size, const int64_t num);
 
+
+goldbach_data_t* goldbach_data_init() {
+  goldbach_data_t* data = calloc(1, sizeof(goldbach_data_t));
+
+  if (data == NULL) {
+    return NULL;
+  }
+
+  data->goldbach_arr = goldbach_arr_create();
+
+  if (data->goldbach_arr == NULL) {
+    free(data);
+    return NULL;
+  }
+
+  return data;
+}
+
 /**
  * @brief returns a set up goldbach_arr based on the
  * arguments/paramenters
@@ -170,14 +234,8 @@ int64_t* size, const int64_t num);
  * @param argv arguments
  * @return golbach_conjecture_t* 
  */
-goldbach_conjecture_t* goldbach_set_up(int* argc, char*** argv) {
-  if (*argc > 2) {
-    return NULL;
-  }
-
-  goldbach_arr_t* goldbach_arr = goldbach_arr_create();
-
-  if (goldbach_arr == NULL) {
+goldbach_conjecture_t* goldbach_set_up(int argc, char** argv) {
+  if (argc > 2) {
     return NULL;
   }
 
@@ -185,22 +243,28 @@ goldbach_conjecture_t* goldbach_set_up(int* argc, char*** argv) {
   calloc(1, sizeof(goldbach_conjecture_t)));
 
   if (goldbach_conjecture == NULL) {
-    free(goldbach_arr);
     return NULL;
   }
 
-  goldbach_conjecture->goldbach_arr = goldbach_arr;
-  goldbach_conjecture->thread_amount = sysconf(_SC_NPROCESSORS_ONLN);
+  // goldbach_conjecture->goldbach_arr = goldbach_arr;
+  goldbach_conjecture->thread_amount = 0;
+  goldbach_conjecture->thread_amount = 0;
   goldbach_conjecture->max_value = 0;
+  goldbach_conjecture->number_capacity = 10;
+  goldbach_conjecture->number_count = 0;
+  goldbach_conjecture->numbers =
+  calloc(goldbach_conjecture->number_capacity, sizeof(int64_t));
 
-  if (*argc == 2) {
-    int32_t thread_amount = 0;
-    sscanf(*argv[1], "%i", &thread_amount);
-    goldbach_conjecture->thread_amount = thread_amount;
+  if (goldbach_conjecture->numbers == NULL) {
+    free(goldbach_conjecture);
+    return NULL;
   }
 
-  goldbach_conjecture->argc = argc;
-  goldbach_conjecture->argv = argv;
+  if (argc == 2) {
+    int32_t thread_amount = 0;
+    sscanf(argv[1], "%i", &thread_amount);
+    goldbach_conjecture->thread_amount = thread_amount;
+  }
 
   return goldbach_conjecture;
 }
@@ -254,17 +318,26 @@ int32_t goldbach_read_numbers(goldbach_conjecture_t* goldbach_conjecture) {
 
 int32_t add_number(goldbach_conjecture_t* goldbach_conjecture,
 unit_t current_val_read) {
-  int32_t number_addition_error =
-    goldbach_add_num(goldbach_conjecture->goldbach_arr, current_val_read);
-  if (number_addition_error == EXIT_SUCCESS) {
-    if (current_val_read < 0) {
-      current_val_read *= -1;
-    }
+  int32_t number_addition_error = EXIT_SUCCESS;
 
-    if (goldbach_conjecture->max_value < current_val_read) {
-      goldbach_conjecture->max_value = current_val_read;
+  if (goldbach_conjecture->number_capacity ==
+  goldbach_conjecture->number_count) {
+    goldbach_conjecture->number_capacity *= 10;
+    int64_t* buffer = realloc(goldbach_conjecture->numbers,
+    goldbach_conjecture->number_capacity * sizeof(int64_t));
+
+    if (buffer == NULL) {
+      return EXIT_FAILURE;
+    } else {
+      goldbach_conjecture->numbers = buffer;
     }
   }
+
+  goldbach_conjecture->numbers[goldbach_conjecture->number_count] =
+  current_val_read;
+
+  goldbach_conjecture->number_count += 1;
+
   return number_addition_error;
 }
 
@@ -364,97 +437,223 @@ bool check_all_chars(char string[64], int32_t* minus_found, bool* num_found) {
 int32_t goldbach_process_sums(goldbach_conjecture_t* goldbach_conjecture) {
   int32_t num_process_error = EXIT_SUCCESS;
 
-  prime_search_atkins_sieve(goldbach_conjecture, 1,
-  goldbach_conjecture->max_value);
-  
-  if (MPI_Init(goldbach_conjecture->argc, goldbach_conjecture->argv)
-      == MPI_SUCCESS) {
-    mpi_process_nums(goldbach_conjecture);
-  } else {
-    num_process_error = EXIT_FAILURE;
-  }
+  int32_t number_amount = goldbach_conjecture->number_count,
+  thread_amount = goldbach_conjecture->thread_amount;
+  int64_t* numbers = goldbach_conjecture->numbers;
+
+  mpi_process_nums(number_amount, numbers, thread_amount);
 
   return num_process_error;
 }
 
-void mpi_process_nums(goldbach_conjecture_t* goldbach_conjecture) {
+void mpi_process_nums(int32_t number_amount,
+int64_t* numbers, int32_t thread_amount) {
   int rank = 0, size = 0;
 
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  printf("Process %i, out of %i\n", rank, size);
+  if (size == 1) {
+    // process normally
+    goldbach_data_t* data = goldbach_data_init();
+    for (int num = 0; num < number_amount; ++num) {
+      goldbach_add_num(data->goldbach_arr, numbers[num]);
+    }
 
-  // if not rank 0 (all other processes)
-  if (rank != 0){ 
-    // send ready
-    MPI_send(&rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+    data->max_value =
+    goldbach_arr_get_max_value(data->goldbach_arr);
 
-    // receive number
-    int number = 0;
-
-    MPI_Recv(&number, 1,
-    MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-    // receive primer numbers
-
+    if (thread_amount == 0) {
+      thread_amount = sysconf(_SC_NPROCESSORS_ONLN);
+    }
 
     // process data
+    run_threads(data, thread_amount, number_amount);
 
+    // send total amount of sums
+    int sums_amount =
+    goldbach_arr_get_total_sums_amount(data->goldbach_arr);
 
-    // send data
+    // print totals
+    printf("Total %i numbers %i sums\n\n",
+    number_amount, sums_amount);
 
+    mpi_print_sums(data);
 
-  // for process 0
-  } else {
-    int rank_to_send = 0;
+    goldbach_arr_destroy(data->goldbach_arr);
+    free(data->prime_number_list);
+    free(data);
 
-    int current_number = 0;
+    return;
+  }
+
+  mpi_rank_0(size, number_amount, numbers, thread_amount);
+}
+
+int get_start_pos(const int i, const int d, const int w) {
+  int base = d/w;
+  int minimum = MIN(i, d%w);
+  int result = ((i * (base)) + minimum);
+  return result;
+}
+
+void mpi_rank_0(int size, int number_amount,
+    int64_t* numbers, int32_t thread_amount) {
+  int32_t* processes = calloc(size -1, sizeof(int32_t));
+  int32_t rank_to_send = -1;
+
+  // printf("size: %i\n", size);
+  for (int process = 0; process < size - 1; ++process) {
+    // printf("process: %i\n", process);
+    int start_pos = get_start_pos(process, number_amount, size - 1);
+    int stop_pos = get_start_pos(process + 1, number_amount, size - 1);
+    int block_size = stop_pos - start_pos;
+
+    // printf(">receving rank\n");
     // receive ready
     MPI_Recv(&rank_to_send, 1,
     MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-    // send number
-    MPI_send(&rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-    current_number++;
+    processes[process] = rank_to_send;
 
-    // if no more numbers
-    if (current_number >= goldbach_get_arr_count(goldbach_conjecture->goldbach_arr)) {
-      // finalize
-      MPI_Finalize();
-    }
+    // printf(">sending thread amount\n");
+    // send thread_amount
+    MPI_Send(&thread_amount, /* amount */1, MPI_INT,
+        rank_to_send, 0, MPI_COMM_WORLD);
 
-    // send prime numbers
+    // printf(">sending number amount: %i\n", block_size);
+    // send number amount
+    MPI_Send(&block_size, /* amount */1, MPI_INT,
+        rank_to_send, 0, MPI_COMM_WORLD);
 
-    // receive data
+    // printf(">sending numbers: %i\n", start_pos);
+    // send numbers
+    MPI_Send((void*) &numbers[start_pos], /* amount */block_size,
+        MPI_LONG_LONG, rank_to_send, 0, MPI_COMM_WORLD);
 
-    // store data
+    // printf(">finished providing\n");
+  }
+  int total_sums = 0;
+
+  // printf(">receving totals\n");
+  // receive totals
+  for (int position = 1; position < size; ++position) {
+    int local_sum = -1;
+    MPI_Recv(&local_sum, 1, MPI_INT, position,
+    0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    total_sums += local_sum;
   }
 
-  if (goldbach_conjecture->thread_amount >
-      goldbach_get_arr_count(goldbach_conjecture->goldbach_arr)) {
-    goldbach_conjecture->thread_amount =
-    goldbach_get_arr_count(goldbach_conjecture->goldbach_arr);
+  // print totals
+  printf("Total %i numbers %i sums\n\n",
+  number_amount, total_sums);
+
+  for (int position = 0; position < size - 1; ++position) {
+    // send order to print processes[position]
+    MPI_Send(&position, /* amount */1, MPI_INT,
+    processes[position], 0, MPI_COMM_WORLD);
   }
 
-  num_process_error = run_threads(goldbach_conjecture);
-  
-  free(goldbach_conjecture->prime_number_list);
+  free(processes);
 }
 
-int32_t run_threads(goldbach_conjecture_t* goldbach_conjecture) {
+void goldbach_mpi_process(int rank) {
+  goldbach_data_t* data = goldbach_data_init();
+
+  int32_t number_amount = -1, thread_amount = 0;
+
+  int64_t* numbers = NULL;
+
+  // printf("sending ready rank\n");
+  // send ready
+  MPI_Send(&rank, 1, MPI_INT, /*destination*/ 0, 0, MPI_COMM_WORLD);
+
+  // printf("receving thread amount\n");
+  // receive thread amount
+  MPI_Recv(&thread_amount, 1,
+  MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+  // if thread amount = 0, then use system amount
+  if (thread_amount == 0) {
+    thread_amount = sysconf(_SC_NPROCESSORS_ONLN);
+  }
+
+  // printf("receving number amount\n");
+  // receive number amount
+  MPI_Recv(&number_amount, 1,
+  MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+  mpi_goldbach_process(data, number_amount, numbers, thread_amount);
+
+  goldbach_arr_destroy(data->goldbach_arr);
+  free(data->prime_number_list);
+  free(data);
+}
+
+void mpi_goldbach_process(goldbach_data_t* data,
+    int number_amount, int64_t* numbers, int32_t thread_amount) {
+  numbers = calloc(number_amount, sizeof(int64_t));
+
+  // printf("receving numbers: %i\n", number_amount);
+  // receive numbers
+  MPI_Recv(numbers, number_amount,
+  MPI_LONG_LONG, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+  // printf("adding numbers\n");
+  // add numbers
+  for (int num = 0; num < number_amount; ++num) {
+    // printf("num: %i: %li\n", num, numbers[num]);
+    goldbach_add_num(data->goldbach_arr, numbers[num]);
+    // printf("num added\n");
+  }
+
+  free(numbers);
+
+  // printf("done adding numbers\n");
+
+  data->max_value =
+  goldbach_arr_get_max_value(data->goldbach_arr);
+
+  // fprintf(stderr, "processing data\n");
+  // process data
+  run_threads(data, thread_amount, number_amount);
+
+  // printf("data processed\n");
+  // send total amount of sums
+  int sums_amount =
+  goldbach_arr_get_total_sums_amount(data->goldbach_arr);
+
+  // printf("sending sum amount: %i\n", sums_amount);
+  MPI_Send(&sums_amount, 1, MPI_INT, /*destination*/ 0, 0, MPI_COMM_WORLD);
+
+  // printf("receiving order to print\n");
+  // wait for order to print
+  int order = -1;
+  MPI_Recv(&order, 1,
+  MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+  // print
+  mpi_print_sums(data);
+}
+
+int32_t run_threads(goldbach_data_t* goldbach_conjecture,
+int32_t thread_amount, int32_t number_amount) {
   int32_t num_process_error = EXIT_SUCCESS;
 
-  int32_t thread_amount = goldbach_conjecture->thread_amount;
+  if (number_amount < thread_amount) {
+    thread_amount = number_amount;
+  }
 
-  printf("thread amount: %i\n", thread_amount);
+  if (thread_amount == 0) {
+    return EXIT_SUCCESS;
+  }
 
   #pragma omp parallel num_threads(thread_amount) \
-    default(none) shared(goldbach_conjecture, num_process_error)  
-  {
+    default(none) shared(goldbach_conjecture, num_process_error)
+  {  // NOLINT
     int32_t local_error = EXIT_SUCCESS;
-    printf("Hello from thread: %i\n", omp_get_thread_num());
+
     // for all elements/numbers in a goldbach_arr
     #pragma omp for
     for (int64_t number = 0;
@@ -462,7 +661,7 @@ int32_t run_threads(goldbach_conjecture_t* goldbach_conjecture) {
     number++) {
       local_error = num_golbach_process(goldbach_conjecture, number);
 
-      if(local_error != EXIT_SUCCESS) {
+      if (local_error != EXIT_SUCCESS) {
         #pragma omp critical
         num_process_error = local_error;
       }
@@ -476,7 +675,7 @@ int32_t run_threads(goldbach_conjecture_t* goldbach_conjecture) {
  * Processes operations to determine goldbach sums
  * 
  */
-int32_t num_golbach_process(goldbach_conjecture_t* goldbach_data,
+int32_t num_golbach_process(goldbach_data_t* goldbach_data,
 const int64_t position) {
   int32_t num_process_error = EXIT_SUCCESS;
 
@@ -512,7 +711,7 @@ const int64_t position) {
  * processes an odd number according to the goldbach conjecture
  * 
  */
-int32_t goldbach_odd_process(goldbach_conjecture_t* goldbach_data,
+int32_t goldbach_odd_process(goldbach_data_t* goldbach_data,
 const unit_t number, bool positive, const int64_t position) {
   const int32_t size = 3;
   unit_t third_number = 0;
@@ -569,7 +768,7 @@ const unit_t number, bool positive, const int64_t position) {
  * processes an even number according to the goldbach conjecture
  * 
  */
-int32_t goldbach_even_process(goldbach_conjecture_t* goldbach_data,
+int32_t goldbach_even_process(goldbach_data_t* goldbach_data,
 const unit_t number, bool positive, const int64_t position) {
   int32_t num_process_error = EXIT_SUCCESS;
 
@@ -612,7 +811,7 @@ const unit_t number, bool positive, const int64_t position) {
  * Finds the next prime number after the given number
  */
 unit_t find_next_prime(const unit_t last_prime,
-goldbach_conjecture_t* goldbach_conjecture) {
+goldbach_data_t* goldbach_conjecture) {
   // if even start at next number
   unit_t number = last_prime + 1;
 
@@ -630,7 +829,7 @@ goldbach_conjecture_t* goldbach_conjecture) {
 }
 
 // finds all prime numbers needed to process all numbers
-void prime_search_atkins_sieve(goldbach_conjecture_t* goldbach_conjecture,
+void prime_search_atkins_sieve(goldbach_data_t* goldbach_conjecture,
 int64_t initPos, int64_t finalPos) {
   int64_t limit = finalPos;
   goldbach_conjecture->prime_number_list =
@@ -692,7 +891,7 @@ int64_t initPos, int64_t finalPos) {
  * Based on the principle where all prime numbers greater than 3
  * can be representad as 6k + 1
  */
-bool isPrimeNum(const unit_t number, goldbach_conjecture_t* goldbach_data) {
+bool isPrimeNum(const unit_t number, goldbach_data_t* goldbach_data) {
   unit_t comparator = 5;
   if (number < goldbach_data->prime_number_list_capacity) {
     return goldbach_data->prime_number_list[number];
@@ -731,6 +930,35 @@ void goldbach_print_sums(goldbach_conjecture_t* goldbach_conjecture) {
   printf("Total %" PRId64 " numbers %" PRId64 " sums\n\n",
   goldbach_get_arr_count(goldbach_conjecture->goldbach_arr),
   goldbach_arr_get_total_sums_amount(goldbach_conjecture->goldbach_arr));
+
+  // for each number
+  for (int64_t num = 0;
+  num < goldbach_get_arr_count(goldbach_conjecture->goldbach_arr);
+  num++) {
+  unit_t current_num =
+  goldbach_get_current_number(goldbach_conjecture->goldbach_arr, num);
+
+    print_sums_amount(goldbach_conjecture->goldbach_arr,
+    &sum_amount, current_num, num);
+
+    if (sum_amount == 0) {
+      continue;
+    }
+
+    // check if sums need to be printed
+    if (current_num < 0) {
+      printf(": ");
+      // if so, for all sums for the given number
+      print_sums_for_num(goldbach_conjecture->goldbach_arr,
+      sum_amount, current_sum, &size, num);
+    }
+    printf("\n");
+  }
+}
+
+void mpi_print_sums(goldbach_data_t* goldbach_conjecture) {
+  int64_t size = 0, sum_amount = 0;
+  unit_t* current_sum = NULL;
 
   // for each number
   for (int64_t num = 0;
@@ -811,13 +1039,10 @@ int64_t* size, const int64_t num) {
   }
 }
 
-
 /**
  * Frees all alocated memory for goldbach_conjecture
- * 
  */
 void goldbach_conjecture_destroy(goldbach_conjecture_t* goldbach_conjecture) {
-  goldbach_arr_destroy(goldbach_conjecture->goldbach_arr);
-
+  free(goldbach_conjecture->numbers);
   free(goldbach_conjecture);
 }
