@@ -641,6 +641,9 @@ int32_t run_threads(goldbach_data_t* goldbach_conjecture,
 int32_t thread_amount, int32_t number_amount) {
   int32_t num_process_error = EXIT_SUCCESS;
 
+  prime_search_atkins_sieve(goldbach_conjecture,
+  0, goldbach_conjecture->max_value);
+
   if (number_amount < thread_amount) {
     thread_amount = number_amount;
   }
