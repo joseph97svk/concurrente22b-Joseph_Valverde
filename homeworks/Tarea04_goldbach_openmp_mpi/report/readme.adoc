@@ -53,6 +53,46 @@ The correct balancing of the workload is essential in the parallelization of wor
 
 Another caveat learned from this is that there are substantial amounts in the processing line that are still single threaded and as such, any change or rebalancing of the pipeline could lead to the optimization/solution being rendered redundant or even detrimental.
 
+== OpenMP == 
+
+=== Design ===
+
+The use of openMp required little changes in the previously implemented version. It required the removal of all previosly set concurrency controls and threading controls. Given that a single for, to be used on all numbers, once all prime numbers have been calculated, was used. This for was parallelized with the OpenMp technology which would distribute the tasks of the for loop to each thread. 
+
+=== Speed up ===
+
+This implementation resulted in a speed up, when compared to the previous Pthread implementation, even the optimized version. The declarative nature of the OpenMp leads to opacity to as for why, but, given the previous constraint to use only dynamic mapping, it can be explained that less concurrency controls lead to better performance.
+
+=== Efficiency ===
+
+Given the increase in performance without the increase in resources, the OpenMp version is, among all tested implementations, the most efficient one.
+
+=== Lessons learned ===
+
+As explained in the speed up section, there is opacity as to the reasons of the results. However the choice of the correct mapping and the reduction of concurrency controls due this, can be seen as a reason and as lesson to be considered when choosing how to distrubute the processing of data. 
+
+== MPI == 
+
+=== Design ===
+
+This implementation required larger changes of the design due to the use of several processes. From the begining of execution it became necessary to segregate the tasks of each process. As such the first step became to identificate each process and assign tasks.
+
+For this, process 0 was chosen as an administrator and distrubutor. Process 0 was responsabilized with reading the numbers from the input and then once this data is in the structures find which process is available to process. The mapping for the distrubition of data to be processed is a hybrid between block and dynamic mappings. A block is designated according to the amount of processes that have collected their data. However these blocks are dynamically distrubuted according to which process has arrived first to collect this data. An array of ranks is kept to synchronize the order of data to be printed.
+
+Each other process then processess first the prime numbers for the numbers they have and then the sums for each of the numebers assigned. These then send to process 0 the amount of sums, where once collected, are then printed as a total. With these then process 0 sends signals for each process, in order, to print their results.
+
+=== Speed up ===
+
+There is a speed up, but only when comparted with the serial version and the concurrent version with dynamic mapping. This, however, is not due to the nature of this implementation but rather, of the optimizations present for the serial part of the processing pipeline which were introduced in the Optimization 1 version. The reasoning for the lack of speed up is the distribution of data between processes which have to then coordinate without shared memory and the test case which is unable to correctly saturate the allocated resources. 
+
+=== Efficiency ===
+
+This version also has the least efficiency out of all tested versions, given the lack of a greater increase in performance to go with the increase in resources. Further reasoning is already explained in the speed up section and will be further expanded in the comparisons section of this report. 
+
+=== Lessons learned ===
+
+The use case is as important as the implementation. The current test cases are unable to properly use the resources for this implementation which is designed for large amounts of data, each of which needs to be sufficiently large too. 
+
 == Comparison 01: Optimizations ==
 [#ChartOptimizations.png]
 image::ChartOptimizations.png[]
@@ -89,4 +129,28 @@ One plausible explanation for this bahaviour is found in what sections are paral
 [#tableConcurrencyLevel.png]
 image::TableConcurrencyLevel.png[]
 
+== Comparisons 03 - 04 ==
+[#ChartOptimizations3.png]
+image::ChartOptimizations2.png[]
 
+[#ChartOptimizations4.png]
+image::ChartOptimizations4.png[]
+
+[#tableOptimizations2.png]
+image::TableOptimizations2.png[]
+
+=== Comparison 03: Pthreads-OpenMP
+
+The OpenMp implementation lead to a decrease of the time taken in seconds for the processing of the goldbach numbers when compared to the Pthreads implementation in Optimization 1. The previous implementation received no benefit from the use of concurrency due to the heavy use of serial optimizations. The implementation of OpenMp, however, is unknown due to its declarative nature, making finding the reasoning for these results obscure. The resulting speedup may be the result of less cocurrency controls and better distribution leading to less stalls and serializations of the work. This might be seen as in the previous pthread implementation, required the use of concurrency controls for the distribution of work that was already too brief to benefit from parallelism.
+
+Regardless of the reasoning behing the speedup, given the increase in performance without any increase of the resources allocated, the OpenMp implementation is, within all optimizations performed, the most efficient one. It is also the one with the greatest speedup in relation to the serial version. Comparisons with the concurrent version with dynamic mapping are irrelevant given the fact that this version lacks the optimizations in the prime numbe calculation that Optimization 1 already counts on, making this comparison unfair. 
+
+=== Comparison 04: OpenMP-MPI ===
+
+The MPI implementation results comes as both a surprise as much as completely expected. Giving more resources did not lead to an increase in performance in relation to the OpenMp version which is also present as the multi-threaded implementation of this version. This version ended up slower thatn the OpenMP version and the Optimization 1 version, but still faster than the first concurrent version with dynamic mapping and the serial version. 
+
+The unexpected nature of the results is based on the amount of resources allocated for the processing of the data. 3 machines with 8 cores each were responsible for the processing of the data and 1 machine with 4 cores (of which only one is used) was tasked to distribute and coordinate the other 3 processes. A total 24 cores were tasked with the processing of the prime numbers. 
+
+The expected part results in known architectural and implementation details as well as knownledge of the current test case. The main process is tasked with the distribution of tasks which, over to other machines, adds latency. Each machine calculates all necessary prime numbers and are then read for each number that needs them. The numbers in the test cases are unable to saturate every machine and each of its cores, leading to underutilization and waste of resources. Something which is clearly seen in the abysmal efficiency results. 
+
+Overall the results, in comparison with other past resuls, are not indicative of a bad implementation or wastefulness of process distribution, but rather of the importance of the choice of tasks. Given smaller tasks, single machines or single cores are better suited. Given a task with a large amount of large numbers, would, theoretically lead to speedups one would expect from these configurations. 
