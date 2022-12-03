@@ -6,13 +6,10 @@
 #include <mpi.h>
 #include <MpiError.hpp>
 
-//template <typename dataType = int>
 class Mpi {
 
   int processNumber = -1;
   int processCount = -1;
-  int rank = -1;
-  int totalProcessAmount = -1;
   std::string processHostname;
 
  public:
@@ -22,7 +19,6 @@ class Mpi {
    * @param argc argument count
    * @param argv argument vector
    */
-  template <typename dataType = int>
   Mpi(int& argc, char**& argv) {
     // initialize MPI environment
     if (MPI_Init(&argc, &argv) == MPI_SUCCESS) {
@@ -87,7 +83,24 @@ class Mpi {
     return this->processHostname;
   }
 
+  template <typename dataType>
+  void send(dataType& value, const int toProcess, const int tag = 0) {
+    if (MPI_Send(&value, 1, map(value), toProcess, tag, MPI_COMM_WORLD)
+        != MPI_SUCCESS) {
+      throw MpiError("Could not send data");
+    }
+  }
 
+  template <typename dataType>
+  void receive(dataType& value, int fromProcess, const int tag = MPI_ANY_TAG) {
+    if (MPI_Recv(&value, 1, map(value), fromProcess,
+        tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE)
+        != MPI_SUCCESS) {
+      throw MpiError("Could not receive data");
+    }
+  }
+
+ private:
   static inline MPI_Datatype map(bool) { return MPI_C_BOOL; }
   static inline MPI_Datatype map(char) { return MPI_CHAR; }
   static inline MPI_Datatype map(unsigned char) { return MPI_UNSIGNED_CHAR; }
@@ -102,20 +115,6 @@ class Mpi {
   static inline MPI_Datatype map(float) { return MPI_FLOAT; }
   static inline MPI_Datatype map(double) { return MPI_DOUBLE; }
   static inline MPI_Datatype map(long double) { return MPI_LONG_DOUBLE; }
-
-  void send(dataType value, const int toProcess, const int tag = 0) {
-    if (MPI_Send(&value, 1, map(dataType), toProcess, tag)
-    != MPI_SUCCESS) {
-      throw MpiError("Could not send data");
-    }
-  }
-
-  void receive(dataType* value, int fromProcess, const int tag = MPI_ANY_TAG) {
-    if (MPI_Receive(value, 1, map(dataType), fromProcess, tag, MPI_STATUS_IGNORE)
-    != MPI_SUCCESS) {
-      throw MpiError("Could not receive data");
-    }
-  }
 };
 
 #endif
