@@ -1,0 +1,6 @@
+Ejercicio 38 [array_thrsafe_mutex]
+Modifique su arreglo dinámico en C para que sea thread-safe. Proteja la implementación de cada subrutina pública con un mutex. Note que las subrutinas para incrementar y reducir la capacidad son privadas (no están declaradas en el encabezado .h). El mutex debe ser único para cada instancia de un arreglo, es decir, dos instancias del arreglo no comparten el mismo mutex.
+
+Su implementación debe permitir al siguiente código de prueba correr correctamente sin generar fugas de memoria, accesos inválidos ni condiciones de carrera:
+
+array_thrsafe_mutex/main.c

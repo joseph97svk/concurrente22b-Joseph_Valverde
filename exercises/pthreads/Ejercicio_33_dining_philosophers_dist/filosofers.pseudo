@@ -1,0 +1,43 @@
+procedure main(argc, argv[]):
+  if processNum = 0 then
+    waiter(processCount)
+  else 
+    philosopher(processNum)
+  end if
+end procedure
+
+procedure philosopher(processNum):
+  while true do
+    think()
+    while cannotEat do
+      send(processNum, waiter)
+      receive(canEat, waiter);
+      if canEat then
+        eat();
+        break
+      end if
+    end while
+  end while
+end procedure
+
+procedure waiter(processCount) :
+  canUseChopSticks[processCount]
+
+  while true
+    receive(processNum, anyProcess)
+    left := processNum - 1
+
+    if processNum < 0 then
+      left := processCount - 1
+    end if
+    
+    right := processCount
+
+    if canUseChopSticks[left] and canUseChopSticks[right] then
+      send(canEat, processNum)
+    else 
+      send(cannotEat, processNum)
+    end if
+  end while
+
+end procedure

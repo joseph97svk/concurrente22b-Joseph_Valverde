@@ -1,0 +1,5 @@
+Ejercicio 42 [dancing_pairs_4]
+Modifique su solución al problema Ejercicio 41 [dancing_pairs_3] para asegurarse que los bailarines entren en pareja al salón de baile, el cual tiene una capacidad limitada para la cantidad de parejas dada en la entrada estándar.
+
+Si el salón está lleno, las nuevas parejas deberán esperar a que se libere espacio. Las parejas en el salón bailan hasta cansarse. Para cada bailarín genere un número pseudoaleatorio que indica la cantidad de minutos que baila. Cuando se conforma una pareja, bailarán por el mínimo de minutos de sus integrantes.
+

@@ -1,0 +1,4 @@
+Ejercicio 43 [dancing_pairs_5]
+Modifique su solución al problema Ejercicio 42 [dancing_pairs_4] para que las parejas, después de bailar en el salón, retornen a la sala de espera. Una vez en la sala de espera, la pareja se disuelve y los integrantes pueden hacer pareja con otros, como si llegaran al salón por primera vez.
+
+Reciba en la entrada estándar la cantidad mínima de minutos que un bailarín deberá estar en la pista de baile. En el momento en que todos los bailarines hayan cumplido este tiempo, la simulación termina.

@@ -1,0 +1,2 @@
+Ejercicio 37 [array_reentrant]
+Haga que la siguiente implementación de un arreglo dinámico en C sea reentrante. Asegúrese de que produzca la salida esperada y no genere fugas de memoria ni accesos inválidos (con valgrind o sanitizers):
