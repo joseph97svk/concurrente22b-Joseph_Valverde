@@ -11,9 +11,10 @@ procedure philosopher(processNum):
     think()
     while cannotEat do
       send(processNum, waiter)
-      receive(canEat, waiter);
+      receive(canEat, waiter)
       if canEat then
         eat();
+        send(processNum, waiter)
         break
       end if
     end while
@@ -35,9 +36,15 @@ procedure waiter(processCount) :
 
     if canUseChopSticks[left] and canUseChopSticks[right] then
       send(canEat, processNum)
+      canUseChopSticks[left] := cannotEat
+      canUseChopSticks[right] := cannotEat
     else 
       send(cannotEat, processNum)
     end if
+
+    receive(processNum, anyProcess)
+    canUseChopSticks[left] := canEat
+    canUseChopSticks[right] := canEat
   end while
 
 end procedure
