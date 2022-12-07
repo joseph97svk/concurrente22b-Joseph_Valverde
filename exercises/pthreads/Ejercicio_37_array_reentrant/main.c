@@ -7,7 +7,7 @@
 #define MIN_CNT 10
 #define MAX_CNT 20
 
-void print_array(const char* name, const array_t array)
+void print_array(const char* name, const array_t* array)
 {
 	printf("%s =", name);
 	for ( size_t index = 0; index < array_get_count(array); ++index )
@@ -18,8 +18,8 @@ void print_array(const char* name, const array_t array)
 
 int main()
 {
-	array_t array1 = array_create(MAX_CNT);
-	array_t array2 = array_create(MAX_CNT);
+	array_t* array1 = array_create(MAX_CNT);
+	array_t* array2 = array_create(MAX_CNT);
 
 	srand( (unsigned int)((unsigned long)time(NULL) + clock()) );
 	for ( size_t index = 0, count = MIN_CNT + rand() % MAX_CNT; index < count; ++index )
