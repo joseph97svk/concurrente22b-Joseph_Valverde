@@ -55,3 +55,7 @@ mutex
 rwlock
 
 Elabore en su hoja de cálculo un gráfico con cuatro series (una por cada fila) que permita comparar el rendimiento de los mutex contra los candados de lectura-escritura (rwlock). ¿En qué circustancia recomendaría usted usar candados de lectura y escritura? Responda con un comentario en la celda "rwlock" correspondiente.
+
+image::results.png[]
+
+Basado en los resultados de las pruebas, el uso de mutex resultó ser más rápido en todos los casos, por ende, al menos basandose en estas pruebas, se puede decir que siempre es el control de concurrencia a utilizar entre los dos. A pesar de estos resultados, debido a utilizarse pruebas muy breves, la conclusión dada no puede ser considerada como definitiva, ya que los resultados también dependen de la implementación. 
