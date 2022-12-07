@@ -78,14 +78,12 @@ void* array_get_element(array_t* array, size_t index)
 int array_append(array_t* array, void* element)
 {
   pthread_mutex_lock(&array->can_access_array); {
-    //printf("locked\n");
     if ( array->array_count == array->array_capacity )
       if ( ! array_increase_capacity(array) )
         return (void)pthread_mutex_unlock(&array->can_access_array), -1;
 
     array->array_elements[(array->array_count)++] = element;
   } pthread_mutex_unlock(&array->can_access_array);
-  //printf("unlocked\n");
 	return 0; // Success
 }
 
