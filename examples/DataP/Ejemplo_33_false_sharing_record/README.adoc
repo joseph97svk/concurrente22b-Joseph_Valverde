@@ -1,0 +1,37 @@
+Estudie y ejecute el programa dado en sus cuatro modos, usando los argumentos de línea de comandos 0 a 3. Todos los modos realizan las mismas tareas: sumar usando un incremento en una variable compartida, e incrementar un contador compartido. En los modos 0 y 1 las dos tareas se realizan de forma serial. En los modos 2 y 3 la suma y el incremento se realizan de forma concurrente, como se muestra en la siguiente tabla.
+
+Modo	Tipo	Tarea 1	Tarea 2
+0
+
+Sequencial
+
+Suma leyendo el incremento compartido
+
+Incrementa el contador compartido
+
+1
+
+Sequencial
+
+Suma con una copia privada del incremento
+
+Incrementa el contador compartido
+
+2
+
+Concurrente
+
+Suma leyendo el incremento compartido
+
+Incrementa el contador compartido
+
+3
+
+Concurrente
+
+Suma con una copia privada del incremento
+
+Incrementa el contador compartido
+
+Se espera que las versiones seriales tarden aproximadamente lo mismo, y que las versiones concurrentes tarden aproximadamente la mitad de las versiones seriales. Sin embargo, esto no ocurre. Trate de explicar por qué.
+

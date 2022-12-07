@@ -1,0 +1,3 @@
+Suponga que se le contrata para optimizar una solución a un problema que debe encontrar el perímetro mayor para marcar una cerca en mapas. Ya existe una solución serial disponible en la carpeta fence/.
+
+Encuentre las regiones de código que consumen mayor procesamiento y podrían ser las prioritarias de paralelizar. Use una herramienta de profiling para este fin.

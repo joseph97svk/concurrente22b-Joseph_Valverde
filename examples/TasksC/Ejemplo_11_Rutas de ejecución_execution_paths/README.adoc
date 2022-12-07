@@ -1,0 +1,16 @@
+Dos threads ejecutan las siguientes tareas. Liste todas las rutas de ejecución indicando el valor final de la variable x y la salida estándar. Una ruta de ejecución (execution path) es una combinación de instrucciones que depende del orden en que sean ejecutadas.
+
+procedure main:
+  shared x := 0
+  create_thread(thread_a)
+  create_thread(thread_b)
+end procedure
+
+procedure thread_a:
+  x := 5
+  print(x)
+end procedure
+
+procedure thread_b:
+  x := 7
+end procedure

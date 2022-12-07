@@ -1,0 +1,16 @@
+Copie la solución de Ejemplo 55 a la carpeta heat_openacc_cpu. Modifique la solución para paralelizar la simulación con OpenACC. Adapte el Makefile-pgi para generar un ejecutale unificado (unified binary) que incluya código para CPU y GPU. Revise cuidadosamente la salida del compilador. Realice dos tipos de ejecuciones:
+
+1. Ejecute la solución resultante en CPU con los dos casos de prueba de Ejemplo 54 y anote las duraciones en la hoja de cálculo. Verifique que la cantidad de generaciones sea la misma que la versión serial. Compare las duraciones con OpenMP.
+
+2. Ejecute la solución resultante en GPU con los dos casos de prueba de Ejemplo 54 y anote las duraciones en la hoja de cálculo. Verifique que la cantidad de generaciones sea la misma que la versión serial.
+
+La siguiente podría ser una interacción:
+
+$ make
+pgcc -c -g -acc -ta=multicore,tesla -Minfo=accel heat_openacc.c -o heat_openacc.o
+pgcc.   -g -acc -ta=multicore,tesla -Minfo=accel heat_openacc.o -o heat_openacc
+
+$ ACC_DEVICE_TYPE=host ./heat_openacc ../heat_perf/test001.bin 0.1
+...
+$ export ACC_DEVICE_TYPE=nvidia
+$ ./heat_openacc ../heat_perf/test001.bin 0.1

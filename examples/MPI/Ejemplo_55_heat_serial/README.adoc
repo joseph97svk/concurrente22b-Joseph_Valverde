@@ -1,0 +1,7 @@
+Descargue los archivos de la solución serial a una carpeta ejemplos/gpu/heat_serial. Agréguelos a control de versiones. Compile la solución. Realice las cuatro ejecuciones de la columna serial de la hoja de cálculo que descargó en Ejemplo 54, y anote la cantidad de generaciones y sus duraciones. Un ejemplo de ejecución podría ser:
+
+./heat_serial ../heat_perf/test001.bin 0.1
+
+1. Sugerencia 1: realice las ejecuciones en terminales distintas simultáneamente. Es decir, no espere a que la anterior finalice para realizar la siguiente.
+
+2. Sugerencia 2: compare las ejecuciones de su ejecutable generado con GCC y PGI.

@@ -1,0 +1,18 @@
+Modifique los códigos de los hilos para que la instrucción a1 y b1 se ejecuten siempre antes que las instrucciones a2 y b2. Este problema tiene el nombre francés rendezvous que significa encuentro en un punto de ejecución, y ninguno de los dos hilos pueden continuar su ejecución hasta que el otro haya llegado.
+
+procedure main:
+  create_thread(thread_a)
+  create_thread(thread_b)
+end procedure
+
+procedure thread_a:
+  statement a1
+  statement a2
+end procedure
+
+procedure thread_b:
+  statement b1
+  statement b2
+end procedure
+Modifique la red de Petri para que ocurra el encuentro entre los hilos de ejecución:
+

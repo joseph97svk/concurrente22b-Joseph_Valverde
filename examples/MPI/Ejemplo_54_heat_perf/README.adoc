@@ -1,0 +1,1 @@
+Descargue los siguientes archivos a una carpeta ejemplos/gpu/heat_perf. Agregue la hoja de cálculo a control de versiones, pero no los casos de prueba (archivos .bin). Llene las celdas en blanco de la hoja de cálculo con las duraciones de ejecución de las actividades en esta sección. Actualice la gráfica para incluir los incrementos de velocidad en un eje secundario.

@@ -1,0 +1,15 @@
+Corrija el pseudocódigo dado para que los agentes y fumadores logren su objetivo.
+
+Sugerencia. La solución propuesta por Parnas usa tres hilos asistentes llamados pushers que responden a los avisos (signal) del agente, llevan cuenta de los ingredientes disponibles, y avisaan al fumador apropiado. Esta solución agrega las siguientes variables al código provisto:
+
+main:
+	shared mutex := semaphore(1)
+	shared is_match := false
+	shared is_paper := false
+	shared is_tobacco := false
+
+	shared match_sem := semaphore(0)
+	shared paper_sem := semaphore(0)
+	shared tobacco_sem := semaphore(0)
+
+Las variables booleanas indican si un ingrediente está o no disponible en la mesa. Los pushers usan los semáforos con nombre de ingrediente para avisar al fumador con tal ingrediente que los ingredientes complementarios están disponibles.

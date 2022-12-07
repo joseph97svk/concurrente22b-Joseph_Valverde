@@ -1,0 +1,17 @@
+Suponga que el hilo de ejecución principal crea w=100 hilos secundarios con los siguientes códigos.
+
+shared count := 0
+
+procedure main:
+  create_threads(100, secondary)
+end procedure
+
+procedure secondary:
+  for i := 1 to 100 do
+    declare temp := count
+    count := temp + 1
+  end for
+end procedure
+¿Cuál es el valor más grande que la variable compartida count podría llegar a obtener? ¿En qué rutas de ejecución se alcanza este valor?
+
+¿Cuál es el menor valor que la variable compartida count podría llegar a obtener? ¿En qué rutas de ejecución se alcanza este valor?

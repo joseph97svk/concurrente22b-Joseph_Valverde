@@ -1,0 +1,22 @@
+procedure main:
+  declare values as a dynamic array of float
+  declare value_count := 0
+
+  if process_number = 0 then
+    declare value := 0
+    while can_read(stdin) do
+      append(values, value)
+    end while
+
+    value_count := count(values)
+  end if
+
+  // Send a variable or array from the source process to the rest
+  broadcast(&value_count, 1, 0)
+  resize(values, value_count)
+  broadcast(&values, count(values), 0)
+
+  for index := 0 to count(values) do
+    print(process_number, ": ", index, ": ", values[index])
+  end for
+end procedure

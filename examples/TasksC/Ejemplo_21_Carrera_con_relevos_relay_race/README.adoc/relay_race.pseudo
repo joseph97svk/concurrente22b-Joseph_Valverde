@@ -1,0 +1,27 @@
+procedure main(argc, argv[]):
+  if argc = 4 then
+    shared team_count := integer(argv[1])
+    shared stage1_delay := integer(argv[2])
+    shared stage2_delay := integer(argv[3])
+    shared position := 0
+
+    for team := 0 to team_count do
+      create_thread(run_stage1, team)
+      create_thread(run_stage2, team)
+    end for
+  else
+    print "usage: relay_race team_count stage1_delay stage2_delay"
+  end if
+end procedure
+
+procedure run_stage1(team_number):
+  delay(stage1_delay)
+end function
+
+procedure run_stage2(team_number):
+  delay(stage2_delay)
+  declare constant my_team_position = ++position
+  if my_team_position <= 3 then
+    print('Place ', my_team_position, ': team ', team_number)
+  end if
+end procedure

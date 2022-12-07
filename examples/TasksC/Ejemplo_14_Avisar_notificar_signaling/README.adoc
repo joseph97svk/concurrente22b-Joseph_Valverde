@@ -1,0 +1,17 @@
+Modifique los códigos de los hilos para que la instrucción a1 se ejecute siempre antes que la instrucción b1. Esto es, que un hilo envíe una señal (aviso) a otro (signaling).
+
+procedure main:
+  create_thread(thread_a)
+  create_thread(thread_b)
+end procedure
+
+procedure thread_a:
+  statement a1
+end procedure
+
+procedure thread_b:
+  statement b1
+end procedure
+Modifique la red de Petri para que el hilo a haga el aviso al hilo b:
+
+signaling given

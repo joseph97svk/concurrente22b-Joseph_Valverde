@@ -1,0 +1,17 @@
+En una academia de artes los aprendices están entrenando bailes criollos, los cuales se bailan en parejas de un hombre con una mujer. Como es natural, los bailarines no llegan todos al mismo tiempo al salón, sino que cuando se aproximan hacen dos grupos o filas, una de hombres y otra de mujeres. Cuando en ambas filas hay personas, un hombre y una mujer se toman de la mano e ingresan al salón de baile.
+
+Naturalmente si una o varias mujeres llegan a la fila y la fila de hombres está vacía, tendrán que esperar. Lo mismo ocurre si los hombres llegan y encuentran la fila de mujeres vacía. Simule con threads a los bailarines, su espera en las colas, y el ingreso al salón de baile (subrutina dance()). Suponga que los bailarines se leen de la entrada estándar donde W indica una mujer y M un hombre como muestra el siguiente código. Suponga además que el salón tiene capacidad ilimitada para el número de parejas.
+
+main:
+	while true:
+		case read_char() of:
+			'M': create_thread(male)
+			'W': create_thread(female)
+			EOF: return
+
+male:
+	dance()
+
+female:
+	dance()
+Sugerencia. Un semáforo puede representar una cola de espera. Un valor inicial de 0 indica que la cola está vacía. Un valor negativo indica la cantidad de threads esperando en ella.

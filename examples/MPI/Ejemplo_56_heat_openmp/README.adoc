@@ -1,0 +1,3 @@
+Copie la solución de Ejemplo 55 a la carpeta heat_openmp. Modifique la solución para aprovechar los CPU disponibles en la máquina donde se ejecuta la simulación. Use OpenMP como tecnología para paralelizar la simulación.
+
+Ejecute la solución resultante con los dos casos de prueba de Ejemplo 54 y anote las duraciones en la hoja de cálculo. Verifique que la cantidad de generaciones sea la misma que la versión serial.

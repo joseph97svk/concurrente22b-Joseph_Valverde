@@ -1,0 +1,13 @@
+procedure main(argc, argv[])
+  // create thread_count as result of converting argv[1] to integer
+  shared const thread_count = integer(argv[1])
+  create_threads(thread_number, greet)
+  print "Hello from main thread of process ", process_number, " of " \
+    , process_count," on ", process_hostname
+end procedure
+
+procedure greet(thread_number)
+  print "\tHello from thread ", thread_number, " of ", thread_count, \
+    " of process ", process_number, " of ", process_count," on " \
+    , process_hostname
+end procedure

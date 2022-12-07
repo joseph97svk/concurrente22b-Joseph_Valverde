@@ -1,0 +1,1 @@
+Al modelo de Petri de las rutas de ejecución le hizo falta la declaración de la variable commpartida shared x := 0. Modifique la red de Petri para agregar esta instrucción. Use la herramienta Workflow Petrinet Designer (WoPeD) que requiere del ambiente de ejecución de Java.
