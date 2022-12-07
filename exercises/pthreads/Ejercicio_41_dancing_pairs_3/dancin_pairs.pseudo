@@ -1,0 +1,37 @@
+procedure main()
+  while true:
+    semaphore_male = create_semaphore(0)
+    semaphore_female = create_semaphore(0)
+    semaphore_dance = create_semaphore(0)
+
+    case read_char() of:
+      'M': create_thread(male)
+      'W': create_thread(female)
+      EOF: return
+    end case
+  end while
+end procedure
+
+procedure male()
+  signal(semaphore_female)
+
+  wait(semaphore_male)
+
+  signal(semaphore_dance)
+  wait(semaphore_dance)
+
+	dance()
+end procedure
+
+procedure female()
+  signal(semaphore_male)
+
+  wait(semaphore_female)
+
+  wait(semaphore_dance)
+  signal(semaphore_dance)
+
+  wait(semaphore_dance)
+
+	dance()
+end procedure
