@@ -1,0 +1,50 @@
+Ejercicio 2 [glossary]
+Si no lo tiene ya, cree un archivo readme.md o readme.adoc en la raíz de su repositorio. En este documento cree sección llamada Glosario. Conforme vaya avanzando por los vídeos, agregue definiciones, explicaciones o ejemplos, de los siguientes conceptos importantes:
+
+1. Programación serial:
+
+2. Programación concurrente:
+
+3. Programación paralela:
+
+4. Concurrencia de tareas:
+
+5. Paralelismo de datos:
+
+6. Hilo de ejecución:
+
+7. Indeterminismo:
+
+8. Memoria privada y compartida:
+
+9. Espera activa:
+
+10. Condición de carrera:
+
+11. Control de concurrencia:
+
+12. Seguridad condicional:
+
+13. Exclusión mutua:
+
+14. Semáforo:
+
+15. Barrera:
+
+16. Variable de condición:
+
+17. Candado de lectura y escritura:
+
+18. Descomposición:
+
+19. Mapeo:
+
+20. Incremento de velocidad:
+
+21. Comunicación punto a punto entre procesos:
+
+22. Comunicación colectiva entre procesos:
+
+23. Reducción:
+
+Construya este glosario con definiciones y ejemplos cortos pero significativos, de tal forma que le sirva para repasar rápidamente un concepto sin tener que visualizar de nuevo grabaciones.
