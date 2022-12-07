@@ -26,7 +26,8 @@ void array_destroy(array_t* array)
 int array_increase_capacity(array_t* array)
 {
 	size_t new_capacity = 10 * array->array_capacity;
-	array_data_t new_elements = (void**)realloc( array, new_capacity * sizeof(void*) );
+	array_data_t new_elements =
+      (void**)realloc( array->array_elements, new_capacity * sizeof(void*) );
 	if ( new_elements == NULL )
 		return -1;
 
@@ -42,7 +43,8 @@ int array_decrease_capacity(array_t* array)
 	if ( new_capacity < 10 )
 		return 0;
 
-	array_data_t new_elements = (void**)realloc( array, new_capacity * sizeof(void*) );
+	array_data_t new_elements =
+      (void**)realloc( array->array_elements, new_capacity * sizeof(void*) );
 	if ( new_elements == NULL )
 		return -1;
 
@@ -74,7 +76,8 @@ int array_append(array_t* array, void* element)
 	return 0; // Success
 }
 
-size_t array_find_first(const array_t* array, const void* element, size_t start_pos)
+size_t array_find_first(const array_t* array,
+    const void* element, size_t start_pos)
 {
 	for ( size_t index = start_pos; index < array->array_count; ++index )
 		if ( array->array_elements[index] == element )
