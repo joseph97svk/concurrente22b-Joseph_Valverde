@@ -1,50 +1,52 @@
 Ejercicio 2 [glossary]
 Si no lo tiene ya, cree un archivo readme.md o readme.adoc en la raíz de su repositorio. En este documento cree sección llamada Glosario. Conforme vaya avanzando por los vídeos, agregue definiciones, explicaciones o ejemplos, de los siguientes conceptos importantes:
 
-1. Programación serial:
+1. Programación serial: ejecucion de una instrucion posterior a la previa
 
-2. Programación concurrente:
+2. Programación concurrente: ejecucion de instrucciones en la cual el orden no es definido y el tiempo de ejecucion puede ser ocurrir al mismo tiempo
 
-3. Programación paralela:
+3. Programación paralela: ejecucion de instrucciones en la cual diferentes instrucciones son ejecutadas al mismo tiempo en recursos separados. 
 
-4. Concurrencia de tareas:
+4. Concurrencia de tareas: Cuando tareas diferentes son ejecutados en manera concurrente.
 
-5. Paralelismo de datos:
+5. Paralelismo de datos: Cuando un grupo de datos son ejecutados al mismo tiempo. 
 
-6. Hilo de ejecución:
+6. Hilo de ejecución: Un registro de memoria en el cual se guarda el contador de programa y la instruccion que se ejecuta. 
 
-7. Indeterminismo:
+7. Indeterminismo: Es la incertidumbre de que instruccion va a ser ejecutada en algun momento especifico o el orden en el que van a ser ejecutados. 
 
 8. Memoria privada y compartida:
+  - Memoria privada: memoria que solo puede ser accesada por un hilo
+  - Memoria compartida: memoria que puede ser accesada por mas de un hilo. 
 
-9. Espera activa:
+9. Espera activa: Un ciclo en el que uno o mas hilos esperan una respuesta mientras hacen un uso activo de los recursos y ciclos del procesador. 
 
-10. Condición de carrera:
+10. Condición de carrera: La lectura o escrita de una seccion de memoria por mas de un hilo simulataneamente. 
 
-11. Control de concurrencia:
+11. Control de concurrencia: Instrucciones o metodos que permiten que solo un hilo tenga acceso a cierta porcion de la memoria o instruccion. Generalmente se usan para prevenir condiciones de concurrencia. 
 
-12. Seguridad condicional:
+12. Seguridad condicional: control de concurrencia mediante el cual todos los hilos accesan una porcion compartida de memoria, pero solo accesan porciones definidas y delineadas de maneara que ningun hilo accesa memoria de otro hilo.
 
-13. Exclusión mutua:
+13. Exclusión mutua: control de concurrencia mediante el cual un segmento de codigo o memoria solo puede ser accesado por un hilo a la vez. 
 
-14. Semáforo:
+14. Semáforo: control de concurrencia con misma funcionalidad que la exclusion mutua, pero que tiene un contador de accesos que utiliza para delimitar la cantidad de accesos de una porcion del codigo. Este tiene tres caracteristicas principales: 1. Todos son inicilizados con con un valor definido (negativo, 0, positivo). 2. Un hilo puede incrementar el contador permitiendo la entrada de otro si este valor es positivo. 2. Un hilo puede decrementar el valor, de manera que si el valor es negativo, bloquea el acceso de otros hilos.
 
-15. Barrera:
+15. Barrera: Control de concurrencia en el cual se espera que todos los hilos hayan llegado a cierta porcion del codigo antes de que todos estos puedan continuar. 
 
-16. Variable de condición:
+16. Variable de condición: control de concurrencia en la que se utiliza el valor de una variable como condicion para el aceso o bloque del acceso a una porcion de codigo o memoria por parte de un hilo. 
 
-17. Candado de lectura y escritura:
+17. Candado de lectura y escritura: control de concurrencia que permite varias lecturas pero solo una escritura a la vez. 
 
-18. Descomposición:
+18. Descomposición: Metodo por el cual, de un problema o datos, se busca encontrar unidades que se pueden procesar de manera deseada. En el caso de este curso, la implementacion de la descomposicion consiste en la busqueda de unidades balanceadas de datos para su asignacion para procesamiento por parte de los hilos. 
 
-19. Mapeo:
+19. Mapeo: Manera en la que se asignan unidades de trabajo a los ejecutantes. 
 
-20. Incremento de velocidad:
+20. Incremento de velocidad: Reduccion en el tiempo de ejecicion de un programa. 
 
-21. Comunicación punto a punto entre procesos:
+21. Comunicación punto a punto entre procesos: El envio de datos, a traves de mensajes, de un proceso a otro. 
 
-22. Comunicación colectiva entre procesos:
+22. Comunicación colectiva entre procesos: El envio de mensajes a todos los procesos de manera simulatanea. 
 
-23. Reducción:
+23. Reducción: Operacion mediante la cual un conjunto de valores de una coleccion son reducido a solo uno mediante operaciones basicas. 
 
 Construya este glosario con definiciones y ejemplos cortos pero significativos, de tal forma que le sirva para repasar rápidamente un concepto sin tener que visualizar de nuevo grabaciones.
